@@ -551,8 +551,211 @@
       .nav-cta { display: none; }
     }
   </style>
+
+<style>
+  /* ═══════════════════════════════════════════
+     VISUAL FX LAYER — 3D / PARTICLES / GLOW
+  ═══════════════════════════════════════════ */
+
+  /* Particle canvas */
+  #particle-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Cursor glow */
+  #cursor-glow {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(157,78,221,0.08) 0%, rgba(107,33,168,0.04) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+  }
+
+  /* Noise grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.022;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* Everything above canvas */
+  nav, section, footer, #legal-modal { position: relative; z-index: 3; }
+
+  /* Animated background gradient */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(107,33,168,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,180,255,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 60% 20%, rgba(157,78,221,0.07) 0%, transparent 50%);
+    animation: bg-drift 12s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  @keyframes bg-drift {
+    0%   { opacity: 1; transform: scale(1) rotate(0deg); }
+    100% { opacity: 0.7; transform: scale(1.05) rotate(1deg); }
+  }
+
+  /* ── Animated gradient headline text ── */
+  .grad-text {
+    background: linear-gradient(90deg, #c77dff 0%, #00d4ff 40%, #f97316 70%, #c77dff 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: text-shimmer 5s linear infinite;
+  }
+  @keyframes text-shimmer {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  /* ── 3D Card tilt ── */
+  .card {
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    will-change: transform;
+  }
+  .card:hover {
+    box-shadow: 0 20px 60px rgba(107,33,168,0.25), 0 0 0 1px rgba(157,78,221,0.2) !important;
+  }
+
+  /* ── Enhanced glass cards ── */
+  .card {
+    background: rgba(255,255,255,0.035) !important;
+    backdrop-filter: blur(32px) !important;
+    -webkit-backdrop-filter: blur(32px) !important;
+    border: 1px solid rgba(157,78,221,0.18) !important;
+  }
+
+  /* ── Pulsing button glow ── */
+  .btn-orange {
+    animation: btn-pulse 3s ease-in-out infinite;
+  }
+  @keyframes btn-pulse {
+    0%, 100% { box-shadow: 0 0 32px rgba(249,115,22,0.4), 0 0 0 0 rgba(249,115,22,0.3); }
+    50%       { box-shadow: 0 0 48px rgba(249,115,22,0.6), 0 0 20px 8px rgba(249,115,22,0.1); }
+  }
+  .btn-orange:hover { animation: none; }
+
+  /* ── 3D section reveal ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px) rotateX(6deg);
+    transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1),
+                transform 0.7s cubic-bezier(0.22,1,0.36,1) !important;
+    transform-origin: top center;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  /* ── Neon border on feature cards ── */
+  .feat-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .feat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-card);
+    background: linear-gradient(135deg, rgba(157,78,221,0.0) 0%, rgba(0,212,255,0.06) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .feat-card:hover::after { opacity: 1; }
+
+  /* ── Stat counter style ── */
+  .stat-num {
+    font-size: 2.4rem !important;
+    background: linear-gradient(135deg, #c77dff 0%, #00d4ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Glowing section divider line ── */
+  .glow-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #9d4edd, transparent);
+    margin: 0 auto 56px;
+    border-radius: 2px;
+  }
+
+  /* ── For-dot pulse ── */
+  .for-dot {
+    animation: dot-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes dot-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(157,78,221,0.6); }
+    50%       { box-shadow: 0 0 20px rgba(157,78,221,1), 0 0 40px rgba(157,78,221,0.4); }
+  }
+
+  /* ── Testimonial card top accent bar ── */
+  .testi-card {
+    border-top: 2px solid transparent !important;
+    background-image: linear-gradient(rgba(255,255,255,0.035), rgba(255,255,255,0.035)),
+                      linear-gradient(90deg, #9d4edd, #00d4ff) !important;
+    background-origin: border-box !important;
+    background-clip: padding-box, border-box !important;
+  }
+
+  /* ── FAQ accent ── */
+  .faq-item.open {
+    border-color: rgba(157,78,221,0.4) !important;
+    box-shadow: 0 0 24px rgba(107,33,168,0.12);
+  }
+
+  /* ── Hero badge glow ── */
+  .hero-badge {
+    animation: badge-glow 3s ease-in-out infinite alternate;
+  }
+  @keyframes badge-glow {
+    from { box-shadow: 0 0 0 0 rgba(157,78,221,0); }
+    to   { box-shadow: 0 0 20px 4px rgba(157,78,221,0.2); }
+  }
+
+  /* ── Section label upgrade ── */
+  .section-label {
+    background: linear-gradient(90deg, #9d4edd, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Reduce motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    #particle-canvas, #cursor-glow { display: none; }
+  }
+</style>
 </head>
 <body>
+
+  <canvas id="particle-canvas"></canvas>
+  <div id="cursor-glow"></div>
 
   <!-- ── NAV ── -->
   <nav>
@@ -567,7 +770,7 @@
         <div class="hero-badge">AI-Powered Video Automation</div>
       </div>
       <div class="fade-up" style="transition-delay:0.1s">
-        <h1>Stop Clipping<br>Manually. Let <span>AI</span><br>Do the Work.</h1>
+        <h1>Stop Clipping<br>Manually. Let <span class="grad-text">AI</span><br>Do the Work.</h1>
       </div>
       <div class="fade-up" style="transition-delay:0.2s">
         <p class="hero-sub">
@@ -581,12 +784,12 @@
       <!-- Stats Bar -->
       <div class="stats-bar fade-up" style="transition-delay:0.38s">
         <div class="stat-item">
-          <div class="stat-num" id="stat-buyers">347</div>
+          <div class="stat-num" data-count="347">0</div>
           <div class="stat-label">Buyers</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat-item">
-          <div class="stat-num">12,400+</div>
+          <div class="stat-num" data-count="12400" data-suffix="+">0</div>
           <div class="stat-label">Clips Generated</div>
         </div>
         <div class="stat-divider"></div>
@@ -912,9 +1115,10 @@
   <!-- ── WHAT IT DOES ── -->
   <section id="what">
     <div class="container">
-      <div class="section-title fade-up">
+      <div class="section-title fade-up" style="text-align:center">
         <div class="section-label">The System</div>
-        <h2>Three Steps. <span>Zero</span> Manual Work.</h2>
+        <h2>Three Steps. <span class="grad-text">Zero</span> Manual Work.</h2>
+        <div class="glow-line"></div>
       </div>
       <div class="cards-grid">
 
@@ -951,7 +1155,7 @@
     <div class="container">
       <div class="fade-up">
         <div class="section-label">Built For</div>
-        <h2>You've Got Volume. <span>This Handles It.</span></h2>
+        <h2>You've Got Volume. <span class="grad-text">This Handles It.</span></h2>
       </div>
       <div class="for-grid">
 
@@ -996,7 +1200,7 @@
     <div class="container">
       <div class="section-title fade-up" style="text-align:center">
         <div class="section-label">Real Results</div>
-        <h2>What Buyers Are <span>Saying</span></h2>
+        <h2>What Buyers Are <span class="grad-text">Saying</span></h2>
       </div>
       <div class="testi-grid">
 
@@ -1190,7 +1394,7 @@
     <div class="container" style="text-align:center">
       <div class="fade-up">
         <div class="section-label">One-Time Price</div>
-        <h2>Stop Watching Hours.<br><span>Start Posting Clips.</span></h2>
+        <h2>Stop Watching Hours.<br><span class="grad-text">Start Posting Clips.</span></h2>
       </div>
       <div class="price-line fade-up" style="transition-delay:0.1s">
         <span class="price-strike">$149</span>
@@ -1275,8 +1479,142 @@
         }
       });
     }, { threshold: 0.12 });
-
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+  <!-- ── VISUAL FX ── -->
+  <script>
+    /* ── 1. PARTICLE SYSTEM ── */
+    (function() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+      const COUNT = 70, CONNECT_DIST = 130;
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      function rand(min, max) { return Math.random() * (max - min) + min; }
+
+      function Particle() {
+        this.x  = rand(0, W);
+        this.y  = rand(0, H);
+        this.vx = rand(-0.18, 0.18);
+        this.vy = rand(-0.18, 0.18);
+        this.r  = rand(1, 2.2);
+        this.alpha = rand(0.3, 0.8);
+        const palette = ['157,78,221','0,212,255','199,125,255','107,33,168'];
+        this.color = palette[Math.floor(Math.random() * palette.length)];
+      }
+
+      Particle.prototype.update = function() {
+        this.x += this.vx; this.y += this.vy;
+        if (this.x < 0) this.x = W;
+        if (this.x > W) this.x = 0;
+        if (this.y < 0) this.y = H;
+        if (this.y > H) this.y = 0;
+      };
+
+      function init() {
+        resize();
+        particles = Array.from({ length: COUNT }, () => new Particle());
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < COUNT; i++) {
+          const p = particles[i];
+          p.update();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+          ctx.fill();
+
+          for (let j = i + 1; j < COUNT; j++) {
+            const q = particles[j];
+            const dx = p.x - q.x, dy = p.y - q.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < CONNECT_DIST) {
+              const opacity = (1 - dist / CONNECT_DIST) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = `rgba(157,78,221,${opacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', resize);
+      init();
+      draw();
+    })();
+
+    /* ── 2. CURSOR GLOW ── */
+    (function() {
+      const glow = document.getElementById('cursor-glow');
+      let mx = -999, my = -999;
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+      (function loop() {
+        glow.style.left = mx + 'px';
+        glow.style.top  = my + 'px';
+        requestAnimationFrame(loop);
+      })();
+    })();
+
+    /* ── 3. 3D CARD TILT ── */
+    (function() {
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width  - 0.5;
+          const y = (e.clientY - r.top)  / r.height - 0.5;
+          card.style.transform = `perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(8px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    })();
+
+    /* ── 4. COUNTER ANIMATION ── */
+    (function() {
+      const counters = document.querySelectorAll('[data-count]');
+      const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+      const countObs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = parseInt(el.dataset.count);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1800;
+          const start = performance.now();
+
+          function tick(now) {
+            const elapsed = Math.min((now - start) / duration, 1);
+            const val = Math.floor(easeOut(elapsed) * target);
+            el.textContent = val >= 1000
+              ? (val / 1000).toFixed(1).replace('.0','') + 'K' + suffix
+              : val + suffix;
+            if (elapsed < 1) requestAnimationFrame(tick);
+            else el.textContent = target >= 1000
+              ? (target / 1000).toFixed(1).replace('.0','') + 'K' + suffix
+              : target + suffix;
+          }
+
+          requestAnimationFrame(tick);
+          countObs.unobserve(el);
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(el => countObs.observe(el));
+    })();
   </script>
 
   <script>
