@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GhostClip Setup Guide</title>
+</head>
+<body style="margin:0;padding:0;background:#0d0a1a;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#e2d9f3;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0a1a;">
+  <tr><td align="center" style="padding:40px 16px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#110d20;border-radius:16px;border:1px solid rgba(139,92,246,0.2);overflow:hidden;">
+
+      <!-- Header -->
+      <tr>
+        <td style="background:linear-gradient(135deg,#1e1035 0%,#2d1265 100%);padding:44px 40px;text-align:center;border-bottom:1px solid rgba(139,92,246,0.2);">
+          <p style="margin:0 0 10px;font-size:0.72rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#8b5cf6;">GhostClip — Setup Guide</p>
+          <h1 style="margin:0 0 14px;font-size:2rem;font-weight:800;color:#fff;line-height:1.2;">Everything you need.<br/>Let's get you running.</h1>
+          <p style="margin:0;font-size:0.95rem;color:#a78bca;">Follow the video walkthrough, then use this email as your reference.</p>
+        </td>
+      </tr>
+
+      <!-- Download CTA -->
+      <tr>
+        <td style="padding:36px 40px 28px;text-align:center;">
+          <p style="margin:0 0 20px;font-size:1rem;color:#c4b5e0;line-height:1.7;">Your files are ready. The Google Drive folder below contains everything: the Python script, the n8n workflow JSON, the config file, and the full video walkthrough showing you exactly what to do step by step.</p>
+          <a href="[GOOGLE DRIVE LINK]" style="display:inline-block;background:linear-gradient(135deg,#c084fc 0%,#7b2fbe 60%,#3a0070 100%);color:#fff;text-decoration:none;padding:16px 40px;border-radius:100px;font-size:1rem;font-weight:700;letter-spacing:0.02em;">Access Your GhostClip Files</a>
+          <p style="margin:16px 0 0;font-size:0.8rem;color:#5a4d7a;">Link not working? Reply to this email and I'll sort it out.</p>
+        </td>
+      </tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:rgba(139,92,246,0.12);"></div></td></tr>
+
+      <!-- What's in the folder -->
+      <tr>
+        <td style="padding:32px 40px 28px;">
+          <p style="margin:0 0 20px;font-size:0.75rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#7c6fac;">What's in the Drive folder</p>
+
+          <!-- Item -->
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+            <tr>
+              <td style="width:36px;vertical-align:top;padding-top:2px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-align:center;line-height:28px;font-size:0.8rem;color:#c084fc;">1</div>
+              </td>
+              <td style="vertical-align:top;padding-left:14px;">
+                <p style="margin:0 0 3px;font-weight:700;color:#e2d9f3;font-size:0.95rem;">ghostclip.py</p>
+                <p style="margin:0;font-size:0.88rem;color:#9b87bf;">The main Python script. This handles transcription, scoring, and clip extraction. Copy it anywhere on your machine.</p>
+              </td>
+            </tr>
+          </table>
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+            <tr>
+              <td style="width:36px;vertical-align:top;padding-top:2px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-align:center;line-height:28px;font-size:0.8rem;color:#c084fc;">2</div>
+              </td>
+              <td style="vertical-align:top;padding-left:14px;">
+                <p style="margin:0 0 3px;font-weight:700;color:#e2d9f3;font-size:0.95rem;">config.json</p>
+                <p style="margin:0;font-size:0.88rem;color:#9b87bf;">Open this file and paste in the paths to your input and output folders. That's the only config you need to touch.</p>
+              </td>
+            </tr>
+          </table>
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+            <tr>
+              <td style="width:36px;vertical-align:top;padding-top:2px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-align:center;line-height:28px;font-size:0.8rem;color:#c084fc;">3</div>
+              </td>
+              <td style="vertical-align:top;padding-left:14px;">
+                <p style="margin:0 0 3px;font-weight:700;color:#e2d9f3;font-size:0.95rem;">ghostclip-workflow.json</p>
+                <p style="margin:0;font-size:0.88rem;color:#9b87bf;">Import this into n8n. Go to Workflows → Import → paste the JSON. This is the automation layer that watches your folder and triggers the pipeline.</p>
+              </td>
+            </tr>
+          </table>
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="width:36px;vertical-align:top;padding-top:2px;">
+                <div style="width:28px;height:28px;border-radius:50%;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);text-align:center;line-height:28px;font-size:0.8rem;color:#c084fc;">▶</div>
+              </td>
+              <td style="vertical-align:top;padding-left:14px;">
+                <p style="margin:0 0 3px;font-weight:700;color:#e2d9f3;font-size:0.95rem;">Setup Walkthrough Video</p>
+                <p style="margin:0;font-size:0.88rem;color:#9b87bf;">A full screen recording walking through every step. Watch this first — it will save you time.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:rgba(139,92,246,0.12);"></div></td></tr>
+
+      <!-- Requirements reminder -->
+      <tr>
+        <td style="padding:28px 40px;">
+          <p style="margin:0 0 12px;font-size:0.75rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#7c6fac;">You need these installed first</p>
+          <p style="margin:0;font-size:0.88rem;color:#9b87bf;line-height:1.8;">
+            Python 3.10+ &nbsp;·&nbsp; FFmpeg (added to PATH) &nbsp;·&nbsp; Ollama + <code style="background:#0d0a1a;padding:1px 6px;border-radius:4px;color:#c084fc;">ollama pull llama3</code> &nbsp;·&nbsp; n8n via <code style="background:#0d0a1a;padding:1px 6px;border-radius:4px;color:#c084fc;">npm install -g n8n</code> &nbsp;·&nbsp; 8GB RAM minimum &nbsp;·&nbsp; <strong style="color:#e2d9f3;">Desktop or laptop required</strong> (Mac or PC — does not run on mobile)
+          </p>
+        </td>
+      </tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:0 40px;"><div style="height:1px;background:rgba(139,92,246,0.12);"></div></td></tr>
+
+      <!-- Support -->
+      <tr>
+        <td style="padding:28px 40px;text-align:center;">
+          <p style="margin:0;font-size:0.92rem;color:#9b87bf;">Stuck at any step? <strong style="color:#e2d9f3;">Reply to this email</strong> — I personally read every response.</p>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background:#0d0a1a;padding:24px 40px;border-top:1px solid rgba(139,92,246,0.1);text-align:center;">
+          <p style="margin:0 0 6px;font-size:0.82rem;color:#5a4d7a;">Jano Prestige Flow &nbsp;·&nbsp; Hamilton, Ontario, Canada</p>
+          <p style="margin:0;font-size:0.78rem;"><a href="[UNSUBSCRIBE]" style="color:#5a4d7a;text-decoration:underline;">Unsubscribe</a></p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
