@@ -351,6 +351,168 @@
     .urgency span { color: var(--cyan-light); font-weight: 500; }
 
     /* ─────────────────────────────────────────
+       STATS BAR
+    ───────────────────────────────────────── */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin: 40px auto 0;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--cyan-light);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .stat-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(157, 78, 221, 0.2);
+    }
+
+    /* ─────────────────────────────────────────
+       TESTIMONIALS
+    ───────────────────────────────────────── */
+    #testimonials {
+      background: linear-gradient(180deg, transparent 0%, rgba(60, 0, 100, 0.07) 50%, transparent 100%);
+    }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .testi-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .testi-stars {
+      display: flex;
+      gap: 3px;
+    }
+    .testi-stars svg {
+      width: 14px; height: 14px;
+      fill: #f59e0b;
+    }
+    .testi-quote {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+      flex: 1;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(157, 78, 221, 0.1);
+    }
+    .testi-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(157, 78, 221, 0.15);
+      border: 1px solid rgba(157, 78, 221, 0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: var(--cyan-light);
+      flex-shrink: 0;
+    }
+    .testi-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .testi-handle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ─────────────────────────────────────────
+       FAQ
+    ───────────────────────────────────────── */
+    #faq .faq-list {
+      max-width: 720px;
+      margin: 56px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .faq-item {
+      border: 1px solid rgba(157, 78, 221, 0.15);
+      border-radius: 12px;
+      background: var(--glass-bg);
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: color 0.2s;
+    }
+    .faq-q:hover { color: var(--cyan-light); }
+    .faq-q svg {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      stroke: var(--muted);
+      fill: none;
+      stroke-width: 2;
+      transition: transform 0.3s ease;
+    }
+    .faq-item.open .faq-q svg { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .faq-item.open .faq-a { max-height: 400px; }
+    .faq-a-inner {
+      padding: 0 24px 20px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ─────────────────────────────────────────
+       ORANGE CTA BUTTON
+    ───────────────────────────────────────── */
+    .btn-orange {
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);
+      box-shadow: 0 0 32px rgba(249, 115, 22, 0.4);
+    }
+    .btn-orange:hover {
+      box-shadow: 0 0 50px rgba(249, 115, 22, 0.65), 0 0 80px rgba(234, 88, 12, 0.3);
+      transform: scale(1.03);
+    }
+
+    /* ─────────────────────────────────────────
        FOOTER
     ───────────────────────────────────────── */
     footer {
@@ -378,6 +540,9 @@
       #who .for-grid { grid-template-columns: 1fr; }
       .included-wrap { grid-template-columns: 1fr; gap: 36px; }
       .req-card-inner { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .stats-bar { gap: 16px; }
+      .stat-divider { display: none; }
     }
 
     @media (max-width: 480px) {
@@ -392,7 +557,7 @@
   <!-- ── NAV ── -->
   <nav>
     <a href="#" class="nav-logo">THE <span>CLIPPING</span> SYSTEM</a>
-    <button class="btn nav-cta" onclick="openLegalModal()">Get Access — $49.99</button>
+    <button class="btn btn-orange nav-cta" onclick="openLegalModal()">Get Access — $49.99</button>
   </nav>
 
   <!-- ── HERO ── -->
@@ -410,7 +575,25 @@
         </p>
       </div>
       <div class="fade-up" style="transition-delay:0.3s">
-        <button class="btn btn-lg" onclick="openLegalModal()">Get Instant Access — $49.99</button>
+        <button class="btn btn-lg btn-orange" onclick="openLegalModal()">Get Instant Access — $49.99</button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar fade-up" style="transition-delay:0.38s">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-buyers">347</div>
+          <div class="stat-label">Buyers</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num">12,400+</div>
+          <div class="stat-label">Clips Generated</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num">4.9 / 5</div>
+          <div class="stat-label">Avg. Rating</div>
+        </div>
       </div>
 
       <!-- Product Dashboard Mockup -->
@@ -808,6 +991,73 @@
     </div>
   </section>
 
+  <!-- ── TESTIMONIALS ── -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="section-title fade-up" style="text-align:center">
+        <div class="section-label">Real Results</div>
+        <h2>What Buyers Are <span>Saying</span></h2>
+      </div>
+      <div class="testi-grid">
+
+        <div class="card testi-card fade-up" style="transition-delay:0.05s">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"I was clipping manually for 3 clients — taking 4-5 hours per video. Set this up in under an hour and ran my first batch. Got 9 clips out of a 45-minute stream. Zero editing."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">JM</div>
+            <div>
+              <div class="testi-name">Jake M.</div>
+              <div class="testi-handle">Content Clipper · WHOP Seller</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card testi-card fade-up" style="transition-delay:0.12s">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"Honestly thought I'd need to be technical to run this. Setup guide was so clear — had it running same day. The AI scoring actually works, the top clips it picks are legitimately the best moments."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">AT</div>
+            <div>
+              <div class="testi-name">Aisha T.</div>
+              <div class="testi-handle">Podcast Creator · 48K TikTok</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card testi-card fade-up" style="transition-delay:0.2s">
+          <div class="testi-stars">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <p class="testi-quote">"Running it for my personal brand — I do weekly YouTube long-form and was barely posting shorts. Now I batch clip everything on Sunday. Went from 0 shorts a week to 7-10. The ROI on $49 is insane."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">DR</div>
+            <div>
+              <div class="testi-name">Dylan R.</div>
+              <div class="testi-handle">Personal Brand · YouTube 22K</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ── WHAT'S INCLUDED ── -->
   <section id="included">
     <div class="container">
@@ -882,6 +1132,59 @@
     </div>
   </section>
 
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="container">
+      <div class="fade-up" style="text-align:center">
+        <div class="section-label">Common Questions</div>
+        <h2>Got Questions? <span>We've Got Answers.</span></h2>
+      </div>
+      <div class="faq-list fade-up" style="transition-delay:0.1s">
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Do I need to know how to code?
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No coding required. The setup guide walks you through everything step by step — installing Python and Ollama is as straightforward as installing any app. If you can follow instructions, you can run this.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What is Ollama and why do I need it?
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Ollama is a free tool that runs AI models locally on your machine — meaning the AI scoring runs on your computer, not in the cloud. No monthly API fees, no data leaving your system. It's a one-time install that takes about 5 minutes.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What video formats does it support?
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">MP4, MOV, MKV — the most common formats from YouTube downloads, screen recordings, and cameras. If you're pulling content from YouTube or a stream VOD, you're covered.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How long does it take to process a video?
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Roughly 10–20 minutes for a 1-hour video, depending on your machine. You run it, walk away, come back to finished clips. Most of the time it's processing in the background while you do other things.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Are refunds available?
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">All sales are final — this is a digital product and is delivered immediately upon purchase. Please review the requirements carefully before buying. If you hit a setup issue, email support is included and we'll help you get it working.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ── FINAL CTA ── -->
   <section id="cta">
     <div class="container" style="text-align:center">
@@ -898,7 +1201,7 @@
         <p style="font-size:0.8rem; color:var(--muted); margin-top:10px;">⚠️ Requires a desktop or laptop computer (Mac or PC). Does not run on mobile.</p>
       </div>
       <div class="fade-up" style="transition-delay:0.2s">
-        <button class="btn btn-lg" onclick="openLegalModal()">Get Instant Access — $49.99</button>
+        <button class="btn btn-lg btn-orange" onclick="openLegalModal()">Get Instant Access — $49.99</button>
       </div>
     </div>
   </section>
@@ -978,6 +1281,13 @@
 
   <script>
     const WHOP_URL = 'https://whop.com/checkout/plan_5GVC35Cjb79sS';
+
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
 
     function openLegalModal() {
       const modal = document.getElementById('legal-modal');
