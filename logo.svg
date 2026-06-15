@@ -1,0 +1,38 @@
+<svg width="680" height="320" viewBox="0 0 680 320" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>GhostClip logo</title>
+<desc>GhostClip brand logo with ghost icon and wordmark in purple</desc>
+<defs>
+  <linearGradient id="ghostGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#c084fc"/>
+    <stop offset="100%" stop-color="#7c3aed"/>
+  </linearGradient>
+  <linearGradient id="clipGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#a855f7"/>
+    <stop offset="100%" stop-color="#6d28d9"/>
+  </linearGradient>
+</defs>
+
+<rect width="680" height="320" fill="#08080f" rx="20"/>
+
+<!-- Ghost body -->
+<g transform="translate(70, 55)">
+  <path d="M80 0 C36 0 0 36 0 80 L0 155 L27 133 L54 155 L80 133 L107 155 L134 133 L160 155 L160 80 C160 36 124 0 80 0 Z" fill="url(#ghostGrad)"/>
+  <!-- Eyes whites -->
+  <circle cx="55" cy="72" r="17" fill="#08080f"/>
+  <circle cx="105" cy="72" r="17" fill="#08080f"/>
+  <!-- Pupils -->
+  <circle cx="59" cy="72" r="8" fill="#e9d5ff"/>
+  <circle cx="109" cy="72" r="8" fill="#e9d5ff"/>
+  <!-- Smile -->
+  <path d="M55 108 Q80 126 105 108" stroke="#08080f" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+</g>
+
+<!-- Wordmark -->
+<text x="265" y="150" font-size="90" fill="white" font-family="'Arial Black', Impact, sans-serif" letter-spacing="4">GHOST</text>
+<rect x="265" y="164" width="382" height="4" fill="url(#clipGrad)" rx="2"/>
+<text x="265" y="232" font-size="90" fill="url(#clipGrad)" font-family="'Arial Black', Impact, sans-serif" letter-spacing="4">CLIP</text>
+
+<!-- Tagline -->
+<text x="266" y="272" font-size="12" fill="#a855f7" font-family="Arial, sans-serif" letter-spacing="3.5" font-weight="600">AI-POWERED CLIPPING SYSTEM</text>
+
+</svg>

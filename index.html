@@ -1,1647 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GhostClip — AI-Powered Short-Form Clipping Machine</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:           #04020e;
-      --bg2:          #07041a;
-      --purple:       #7b2fbe;
-      --violet:       #9d4edd;
-      --lavender:     #c77dff;
-      --cyan:         #00d4ff;
-      --orange:       #f97316;
-      --text:         #f0eaff;
-      --muted:        #7a6b9f;
-      --dimmed:       #4a3d6a;
-
-      --glass-bg:     rgba(255, 255, 255, 0.038);
-      --glass-bg2:    rgba(255, 255, 255, 0.065);
-      --glass-border: rgba(157, 78, 221, 0.22);
-      --glass-shine:  rgba(255, 255, 255, 0.08);
-
-      --btn-grad:     linear-gradient(135deg, #fb923c 0%, #f97316 40%, #c2410c 100%);
-      --btn-glow:     0 0 36px rgba(249, 115, 22, 0.5);
-      --purple-glow:  0 0 40px rgba(157, 78, 221, 0.35);
-
-      --radius-lg:    20px;
-      --radius-md:    14px;
-      --radius-sm:    10px;
-      --radius-pill:  100px;
-      --max:          1120px;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ─── TYPOGRAPHY ─── */
-    h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line-height: 1.05; }
-    h1 { font-size: clamp(3.2rem, 8vw, 7.5rem); }
-    h2 { font-size: clamp(2.2rem, 4.5vw, 4rem); }
-    h3 { font-size: clamp(1.3rem, 2.2vw, 1.65rem); letter-spacing: 0.06em; }
-
-    /* ─── LAYOUT ─── */
-    .container { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-    section { padding: 110px 0; }
-
-    /* ─── ANIMATED TEXT ─── */
-    .grad-text {
-      background: linear-gradient(90deg, #c77dff 0%, #00d4ff 35%, #f97316 65%, #c77dff 100%);
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 5s linear infinite;
-    }
-    @keyframes shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
-
-    /* ─── FADE UP ─── */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(36px) rotateX(5deg);
-      transition: opacity 0.75s cubic-bezier(0.22,1,0.36,1), transform 0.75s cubic-bezier(0.22,1,0.36,1);
-      transform-origin: top center;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0) rotateX(0deg); }
-
-    /* ─── BUTTON ─── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--btn-grad);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 17px 42px;
-      border-radius: var(--radius-pill);
-      text-decoration: none;
-      box-shadow: var(--btn-glow);
-      border: none;
-      cursor: pointer;
-      letter-spacing: 0.01em;
-      transition: box-shadow 0.25s, transform 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 55%);
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    .btn:hover {
-      box-shadow: 0 0 60px rgba(249,115,22,0.7), 0 0 100px rgba(234,88,12,0.3);
-      transform: scale(1.035) translateY(-1px);
-    }
-    .btn-lg { font-size: 1.15rem; padding: 20px 56px; }
-    .btn-pulse { animation: btn-pulse 3s ease-in-out infinite; }
-    .btn-pulse:hover { animation: none; }
-    @keyframes btn-pulse {
-      0%, 100% { box-shadow: 0 0 36px rgba(249,115,22,0.5), 0 0 0 0 rgba(249,115,22,0.3); }
-      50%       { box-shadow: 0 0 56px rgba(249,115,22,0.7), 0 0 24px 6px rgba(249,115,22,0.12); }
-    }
-
-    /* ─── GLASS CARD ─── */
-    .card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(28px) saturate(1.4);
-      -webkit-backdrop-filter: blur(28px) saturate(1.4);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 36px 32px;
-      position: relative;
-      overflow: hidden;
-      transform-style: preserve-3d;
-      will-change: transform;
-      transition: transform 0.15s ease, box-shadow 0.2s ease;
-    }
-    /* Glossy shine layer */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 55%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.015) 100%);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      pointer-events: none;
-      z-index: 1;
-    }
-    /* Inner top border highlight */
-    .card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .card:hover {
-      box-shadow: 0 24px 70px rgba(107,33,168,0.3), 0 0 0 1px rgba(157,78,221,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
-    }
-    .card > * { position: relative; z-index: 3; }
-
-    /* ─── SECTION LABELS ─── */
-    .section-label {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      background: linear-gradient(90deg, #9d4edd, #00d4ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 14px;
-    }
-    .section-title { margin-bottom: 60px; }
-    .section-title h2 span { color: var(--lavender); }
-
-    .glow-line {
-      width: 60px; height: 2px;
-      background: linear-gradient(90deg, transparent, #9d4edd, transparent);
-      margin: 0 auto 60px;
-      border-radius: 2px;
-    }
-
-    /* ─────────────────────────────────────────
-       BG CANVAS + CURSOR
-    ───────────────────────────────────────── */
-    #particle-canvas {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    }
-    #cursor-glow {
-      position: fixed;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(157,78,221,0.07) 0%, rgba(107,33,168,0.03) 40%, transparent 70%);
-      pointer-events: none; z-index: 1;
-      transform: translate(-50%, -50%);
-    }
-    body::after {
-      content: '';
-      position: fixed; inset: 0; z-index: 2; pointer-events: none;
-      opacity: 0.018;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-    }
-    /* Animated bg orbs */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 90% 70% at 15% 5%,  rgba(107,33,168,0.14) 0%, transparent 60%),
-        radial-gradient(ellipse 70% 55% at 85% 85%, rgba(0,180,255,0.07)  0%, transparent 55%),
-        radial-gradient(ellipse 55% 45% at 65% 20%, rgba(157,78,221,0.08) 0%, transparent 50%),
-        radial-gradient(ellipse 40% 35% at 30% 75%, rgba(249,115,22,0.04) 0%, transparent 50%);
-      animation: bg-drift 14s ease-in-out infinite alternate;
-    }
-    @keyframes bg-drift {
-      0%   { opacity: 1; transform: scale(1); }
-      100% { opacity: 0.75; transform: scale(1.06) rotate(0.8deg); }
-    }
-    nav, section, footer, #legal-modal, .sticky-cta { position: relative; z-index: 3; }
-
-    /* ─────────────────────────────────────────
-       NAV
-    ───────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 16px; left: 16px; right: 16px;
-      z-index: 200;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(6, 3, 20, 0.75);
-      backdrop-filter: blur(24px) saturate(1.6);
-      -webkit-backdrop-filter: blur(24px) saturate(1.6);
-      border: 1px solid rgba(157, 78, 221, 0.18);
-      border-radius: 100px;
-      box-shadow: 0 4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07);
-    }
-    .nav-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.35rem;
-      letter-spacing: 0.12em;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--lavender); }
-    .nav-links {
-      display: flex; gap: 28px; align-items: center;
-    }
-    .nav-links a {
-      font-size: 0.85rem; font-weight: 500;
-      color: var(--muted); text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { font-size: 0.875rem; padding: 10px 26px; }
-
-    /* ─────────────────────────────────────────
-       HERO
-    ───────────────────────────────────────── */
-    #hero {
-      padding-top: 180px;
-      padding-bottom: 120px;
-      position: relative;
-      text-align: center;
-      overflow: visible;
-    }
-
-    /* Large ambient hero orb */
-    .hero-orb {
-      position: absolute;
-      top: -120px; left: 50%;
-      transform: translateX(-50%);
-      width: 900px; height: 900px;
-      background: radial-gradient(ellipse at center, rgba(107,33,168,0.25) 0%, rgba(80,0,140,0.1) 40%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      animation: orb-float 7s ease-in-out infinite;
-    }
-    @keyframes orb-float {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(-28px); }
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(157,78,221,0.1);
-      border: 1px solid rgba(157,78,221,0.35);
-      border-radius: 100px;
-      padding: 7px 22px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--lavender);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 32px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 24px rgba(157,78,221,0.15);
-      animation: badge-glow 3s ease-in-out infinite alternate;
-    }
-    @keyframes badge-glow {
-      from { box-shadow: 0 0 16px rgba(157,78,221,0.1); }
-      to   { box-shadow: 0 0 28px rgba(157,78,221,0.28); }
-    }
-    .badge-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--lavender);
-      box-shadow: 0 0 10px var(--lavender);
-      animation: dot-blink 2s ease-in-out infinite;
-    }
-    @keyframes dot-blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-
-    #hero h1 { max-width: 960px; margin: 0 auto 24px; }
-    .hero-sub {
-      max-width: 580px;
-      margin: 0 auto 48px;
-      font-size: 1.15rem;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    /* CTA group */
-    .hero-cta-group {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-    .hero-trust {
-      font-size: 0.8rem;
-      color: var(--dimmed);
-      margin-bottom: 64px;
-    }
-    .hero-trust span { color: var(--muted); }
-
-    /* Stats bar */
-    .stats-bar {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0; margin: 0 auto 80px;
-      flex-wrap: wrap;
-      max-width: 600px;
-    }
-    .stat-item { text-align: center; padding: 0 28px; }
-    .stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.4rem;
-      letter-spacing: 0.04em;
-      line-height: 1;
-      background: linear-gradient(135deg, #c77dff 0%, #00d4ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .stat-label {
-      font-size: 0.7rem; font-weight: 600;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--muted); margin-top: 4px;
-    }
-    .stat-divider {
-      width: 1px; height: 40px;
-      background: linear-gradient(180deg, transparent, rgba(157,78,221,0.3), transparent);
-    }
-
-    /* ── 3D Phone Mockup Row ── */
-    .phones-row {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 20px;
-      perspective: 1200px;
-      margin: 0 auto;
-      max-width: 700px;
-    }
-    .phone-wrap {
-      flex-shrink: 0;
-      animation: phone-float 5s ease-in-out infinite;
-    }
-    .phone-wrap:nth-child(1) { transform: rotateY(20deg) rotateX(-4deg); animation-delay: -1.5s; }
-    .phone-wrap:nth-child(2) { transform: rotateY(0deg)  scale(1.1); }
-    .phone-wrap:nth-child(3) { transform: rotateY(-20deg) rotateX(-4deg); animation-delay: -3s; }
-    @keyframes phone-float {
-      0%, 100% { transform-origin: center bottom; margin-bottom: 0; }
-      50%       { margin-bottom: 14px; }
-    }
-    .phone-wrap:nth-child(1) { animation-name: phone-float1; }
-    .phone-wrap:nth-child(3) { animation-name: phone-float3; }
-    @keyframes phone-float1 {
-      0%, 100% { transform: rotateY(20deg) rotateX(-4deg) translateY(0); }
-      50%       { transform: rotateY(20deg) rotateX(-4deg) translateY(-12px); }
-    }
-    @keyframes phone-float3 {
-      0%, 100% { transform: rotateY(-20deg) rotateX(-4deg) translateY(0); }
-      50%       { transform: rotateY(-20deg) rotateX(-4deg) translateY(-12px); }
-    }
-
-    .phone-svg { filter: drop-shadow(0 20px 50px rgba(107,33,168,0.5)); }
-    .phone-center .phone-svg { filter: drop-shadow(0 24px 64px rgba(157,78,221,0.65)); }
-
-    /* ─────────────────────────────────────────
-       STICKY BOTTOM CTA BAR
-    ───────────────────────────────────────── */
-    .sticky-cta {
-      position: fixed;
-      bottom: 20px; left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      z-index: 300;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      background: rgba(6,3,20,0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(157,78,221,0.25);
-      border-radius: 100px;
-      padding: 12px 16px 12px 24px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.06);
-      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
-      white-space: nowrap;
-    }
-    .sticky-cta.visible { transform: translateX(-50%) translateY(0); }
-    .sticky-cta-text {
-      font-size: 0.88rem; font-weight: 500;
-      color: var(--muted);
-    }
-    .sticky-cta-text strong { color: var(--text); }
-    .sticky-btn {
-      font-size: 0.88rem; padding: 12px 28px;
-    }
-
-    /* ─────────────────────────────────────────
-       HOW IT WORKS
-    ───────────────────────────────────────── */
-    #what {
-      background: linear-gradient(180deg, transparent 0%, rgba(60,0,100,0.06) 50%, transparent 100%);
-    }
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .feat-card { cursor: default; }
-    .feat-step {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 3.5rem;
-      line-height: 1;
-      letter-spacing: 0.04em;
-      background: linear-gradient(135deg, rgba(157,78,221,0.6) 0%, rgba(157,78,221,0.08) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 16px;
-    }
-    .feat-card h3 { color: var(--text); margin-bottom: 12px; }
-    .feat-card p { color: var(--muted); font-size: 0.95rem; line-height: 1.75; }
-    .feat-icon {
-      width: 54px; height: 54px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(157,78,221,0.1);
-      border: 1px solid rgba(157,78,221,0.28);
-      border-radius: 14px;
-      margin-bottom: 22px;
-      box-shadow: 0 0 20px rgba(157,78,221,0.12);
-    }
-    .feat-icon svg { width: 26px; height: 26px; stroke: var(--lavender); fill: none; stroke-width: 1.8; }
-
-    /* ─────────────────────────────────────────
-       TIKTOK PROOF SECTION
-    ───────────────────────────────────────── */
-    #proof {
-      background: linear-gradient(180deg, transparent 0%, rgba(60,0,100,0.07) 50%, transparent 100%);
-    }
-    .proof-header { text-align: center; }
-    .proof-sub {
-      font-size: 1rem; color: var(--muted); margin-bottom: 56px;
-      max-width: 480px; margin-left: auto; margin-right: auto;
-    }
-    .tiktok-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      align-items: start;
-    }
-    .tiktok-slot {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: var(--purple-glow);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      position: relative;
-    }
-    .tiktok-slot::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      z-index: 1;
-    }
-    .tiktok-slot:hover {
-      transform: translateY(-6px) scale(1.01);
-      box-shadow: 0 0 60px rgba(157,78,221,0.45);
-    }
-    /* TikTok embed override */
-    .tiktok-slot blockquote.tiktok-embed {
-      margin: 0 !important;
-      border: none !important;
-      background: transparent !important;
-      min-height: 700px;
-    }
-    /* Placeholder when video ID not set */
-    .tiktok-placeholder {
-      aspect-ratio: 9/16;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 32px;
-      text-align: center;
-      min-height: 420px;
-    }
-    .tiktok-placeholder svg { opacity: 0.3; }
-    .tiktok-placeholder p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
-    .proof-note {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.88rem;
-      color: var(--dimmed);
-    }
-    .proof-note a { color: var(--lavender); text-decoration: none; }
-    .proof-note a:hover { text-decoration: underline; }
-
-    /* ─────────────────────────────────────────
-       WHO IT'S FOR
-    ───────────────────────────────────────── */
-    .for-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-      margin-top: 60px;
-    }
-    .for-item {
-      display: flex; align-items: flex-start; gap: 20px; padding: 28px 26px;
-      cursor: default;
-    }
-    .for-dot {
-      flex-shrink: 0;
-      width: 10px; height: 10px;
-      background: var(--violet);
-      border-radius: 50%;
-      margin-top: 7px;
-      box-shadow: 0 0 14px rgba(157,78,221,0.7);
-      animation: dot-pulse 2.5s ease-in-out infinite;
-    }
-    @keyframes dot-pulse {
-      0%, 100% { box-shadow: 0 0 8px rgba(157,78,221,0.6); }
-      50%       { box-shadow: 0 0 22px rgba(157,78,221,1), 0 0 40px rgba(157,78,221,0.4); }
-    }
-    .for-item h3 { font-size: 1.05rem; color: var(--text); margin-bottom: 6px; }
-    .for-item p  { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
-
-    /* ─────────────────────────────────────────
-       TESTIMONIALS
-    ───────────────────────────────────────── */
-    #testimonials {
-      background: linear-gradient(180deg, transparent 0%, rgba(60,0,100,0.07) 50%, transparent 100%);
-    }
-    .testi-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: 60px;
-    }
-    .testi-card {
-      display: flex; flex-direction: column; gap: 18px;
-      border-top: 2px solid transparent !important;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.038), rgba(255,255,255,0.038)),
-        linear-gradient(90deg, #9d4edd, #00d4ff) !important;
-      background-origin: border-box !important;
-      background-clip: padding-box, border-box !important;
-    }
-    .testi-stars { display: flex; gap: 3px; }
-    .testi-stars svg { width: 14px; height: 14px; fill: #f59e0b; }
-    .testi-quote { font-size: 0.95rem; color: var(--text); line-height: 1.75; flex: 1; }
-    .testi-author {
-      display: flex; align-items: center; gap: 14px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(157,78,221,0.1);
-    }
-    .testi-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(157,78,221,0.12);
-      border: 1px solid rgba(157,78,221,0.3);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem; color: var(--lavender);
-      flex-shrink: 0;
-    }
-    .testi-name  { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-    .testi-handle { font-size: 0.76rem; color: var(--muted); }
-
-    /* ─────────────────────────────────────────
-       INCLUDED
-    ───────────────────────────────────────── */
-    #included {
-      background: linear-gradient(180deg, transparent 0%, rgba(60,0,100,0.06) 50%, transparent 100%);
-    }
-    .included-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-    .included-list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
-    .included-list li {
-      display: flex; align-items: center; gap: 18px;
-      font-size: 1rem; color: var(--text);
-    }
-    .check {
-      flex-shrink: 0;
-      width: 26px; height: 26px;
-      background: rgba(157,78,221,0.1);
-      border: 1px solid rgba(157,78,221,0.35);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .check svg { width: 13px; height: 13px; stroke: var(--lavender); fill: none; stroke-width: 2.5; }
-    .included-text h2 { margin-bottom: 16px; }
-    .included-text p  { color: var(--muted); font-size: 1rem; line-height: 1.75; }
-    .included-text h2 span { color: var(--lavender); }
-
-    /* ─────────────────────────────────────────
-       REQUIREMENTS
-    ───────────────────────────────────────── */
-    #requirements .req-card {
-      max-width: 720px;
-      margin: 60px auto 0;
-    }
-    .req-card-inner {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px 40px;
-    }
-    .req-label {
-      font-size: 0.7rem; font-weight: 700;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--violet); margin-bottom: 6px;
-    }
-    .req-value { font-size: 0.95rem; color: var(--text); }
-
-    /* ─────────────────────────────────────────
-       FINAL CTA
-    ───────────────────────────────────────── */
-    #cta { text-align: center; }
-    .cta-card {
-      max-width: 680px; margin: 0 auto;
-      padding: 60px 52px;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(32px) saturate(1.5);
-      -webkit-backdrop-filter: blur(32px) saturate(1.5);
-      border: 1px solid rgba(157,78,221,0.28);
-      border-radius: 28px;
-      box-shadow:
-        0 0 80px rgba(107,33,168,0.2),
-        0 32px 80px rgba(0,0,0,0.3),
-        inset 0 1px 0 rgba(255,255,255,0.1);
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 50%;
-      background: linear-gradient(180deg, rgba(157,78,221,0.07) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .cta-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-    }
-    .cta-card > * { position: relative; z-index: 1; }
-    .price-line {
-      display: flex; align-items: center; justify-content: center; gap: 18px;
-      margin: 32px 0 24px;
-    }
-    .price-strike { font-size: 1.3rem; color: var(--dimmed); text-decoration: line-through; }
-    .price-main {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 4.5rem; line-height: 1;
-      background: linear-gradient(135deg, #c77dff 0%, #f97316 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.04em;
-    }
-    .urgency { font-size: 0.9rem; color: var(--muted); margin-bottom: 32px; }
-    .urgency strong { color: var(--lavender); }
-    .cta-perks {
-      display: flex; align-items: center; justify-content: center;
-      gap: 24px; margin-top: 20px; flex-wrap: wrap;
-    }
-    .cta-perk {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 0.8rem; color: var(--muted);
-    }
-    .cta-perk svg { width: 15px; height: 15px; stroke: var(--violet); fill: none; stroke-width: 2; }
-
-    /* ─────────────────────────────────────────
-       FAQ
-    ───────────────────────────────────────── */
-    #faq .faq-list {
-      max-width: 740px; margin: 60px auto 0;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .faq-item {
-      border: 1px solid rgba(157,78,221,0.14);
-      border-radius: 14px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .faq-item.open {
-      border-color: rgba(157,78,221,0.4);
-      box-shadow: 0 0 28px rgba(107,33,168,0.14);
-    }
-    .faq-q {
-      width: 100%; background: none; border: none;
-      color: var(--text); font-family: 'DM Sans', sans-serif;
-      font-size: 1rem; font-weight: 600; text-align: left;
-      padding: 20px 26px; cursor: pointer;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      transition: color 0.2s;
-    }
-    .faq-q:hover { color: var(--lavender); }
-    .faq-q svg { flex-shrink: 0; width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 2; transition: transform 0.3s ease; }
-    .faq-item.open .faq-q svg { transform: rotate(45deg); }
-    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-    .faq-item.open .faq-a { max-height: 400px; }
-    .faq-a-inner { padding: 0 26px 22px; font-size: 0.95rem; color: var(--muted); line-height: 1.75; }
-
-    /* ─────────────────────────────────────────
-       FOOTER
-    ───────────────────────────────────────── */
-    footer {
-      border-top: 1px solid rgba(157,78,221,0.08);
-      padding: 36px 28px;
-      text-align: center;
-      font-size: 0.8rem; color: var(--muted);
-      display: flex; align-items: center; justify-content: center;
-      gap: 28px; flex-wrap: wrap;
-    }
-    footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    footer a:hover { color: var(--lavender); }
-
-    /* ─────────────────────────────────────────
-       RESPONSIVE
-    ───────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .cards-grid     { grid-template-columns: 1fr; }
-      .tiktok-grid    { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
-      .testi-grid     { grid-template-columns: 1fr; }
-      .included-wrap  { grid-template-columns: 1fr; gap: 40px; }
-      .req-card-inner { grid-template-columns: repeat(2, 1fr); }
-      .for-grid       { grid-template-columns: 1fr; }
-      .nav-links      { display: none; }
-      .phones-row .phone-wrap:nth-child(1),
-      .phones-row .phone-wrap:nth-child(3) { display: none; }
-    }
-    @media (max-width: 600px) {
-      section { padding: 80px 0; }
-      #hero { padding-top: 130px; padding-bottom: 80px; }
-      .cta-card { padding: 40px 28px; }
-      .req-card-inner { grid-template-columns: 1fr; }
-      .stats-bar { gap: 0; }
-      .stat-divider { display: none; }
-      .stat-item { padding: 0 16px; }
-      .sticky-cta-text { display: none; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-      #particle-canvas, #cursor-glow { display: none; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="GhostClip — turn one long video into 87+ ready-to-post vertical clips, automatically, on your own machine. $49.99 once, no subscription."/>
+<title>GhostClip — Turn 1 video into 87 clips</title>
+<link rel="icon" href="logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script>
+(function(){var s=localStorage.getItem('gc-theme');var sys=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',s||sys);})();
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-solid:#06060f;--text:#e8e6ff;--muted:#9b93c4;
+  --accent:#5b8cff;--accent2:#a855f7;
+  --head-grad:linear-gradient(180deg,#fff 0%,#cdc6f2 52%,#9a8fd0 100%);
+  --cta:linear-gradient(135deg,#5b8cff,#a855f7);--cta-fg:#0a0820;
+  --glass:rgba(170,150,255,.08);--glass-bd:rgba(195,180,255,.2);--glass-hi:rgba(175,160,255,.07);
+  --aurora1:rgba(27,123,255,.28);--aurora2:rgba(168,85,247,.26);--aurora3:rgba(124,58,237,.22);
+  --hero-bg:radial-gradient(130% 100% at 70% 6%,#1b1640 0%,#0a0a20 55%,#06060f 100%);
+  --ease:cubic-bezier(.2,.7,.2,1);--logo:url(logo.svg);--shadow:0 24px 60px rgba(10,4,40,.5);
+  --page-bg:radial-gradient(45% 30% at 82% 8%,rgba(27,123,255,.20),transparent 60%),radial-gradient(40% 30% at 8% 30%,rgba(168,85,247,.18),transparent 60%),radial-gradient(46% 34% at 90% 55%,rgba(124,58,237,.22),transparent 60%),radial-gradient(40% 30% at 10% 78%,rgba(91,140,255,.14),transparent 60%),radial-gradient(44% 32% at 86% 96%,rgba(168,85,247,.16),transparent 60%),linear-gradient(180deg,#0a0a20 0%,#06060f 50%,#08061a 100%);
+}
+:root[data-theme=light]{
+  --bg-solid:#f3f0ff;--text:#1a1340;--muted:#5a5285;
+  --accent:#1b7bff;--accent2:#7c3aed;
+  --head-grad:linear-gradient(180deg,#1a1340 0%,#5b3aa0 100%);
+  --cta:linear-gradient(135deg,#1b7bff,#7c3aed);--cta-fg:#fff;
+  --glass:rgba(255,255,255,.62);--glass-bd:rgba(255,255,255,.95);--glass-hi:rgba(255,255,255,.55);
+  --aurora1:rgba(120,160,255,.30);--aurora2:rgba(180,150,255,.34);--aurora3:rgba(124,58,237,.12);
+  --hero-bg:linear-gradient(165deg,#ffffff 0%,#efeaff 100%);--shadow:0 24px 60px rgba(60,40,120,.16);
+  --page-bg:radial-gradient(45% 30% at 82% 8%,rgba(120,160,255,.22),transparent 60%),radial-gradient(40% 30% at 8% 30%,rgba(190,165,255,.32),transparent 60%),radial-gradient(46% 34% at 90% 58%,rgba(124,58,237,.10),transparent 60%),radial-gradient(42% 30% at 12% 88%,rgba(150,170,255,.20),transparent 60%),linear-gradient(180deg,#fbfaff 0%,#efeaff 100%);
+}
+html{scroll-behavior:smooth;background:var(--bg-solid);transition:background-color .4s var(--ease)}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--text);background:var(--page-bg) fixed;line-height:1.65;overflow-x:hidden;transition:color .4s var(--ease),background .4s var(--ease)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 6%}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{line-height:1.06;letter-spacing:-.5px}
+.grad-text{background:var(--head-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.eyebrow{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--accent2);font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--cta);color:var(--cta-fg);font-weight:800;font-size:14px;padding:14px 26px;border-radius:11px;border:0;cursor:pointer;box-shadow:0 0 30px rgba(124,58,237,.4);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 8px 36px rgba(124,58,237,.55)}
+.glass{background:linear-gradient(155deg,var(--glass),rgba(170,150,255,.02));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-bd);border-radius:18px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.09)}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}
+.nav{position:fixed;z-index:50;top:16px;left:50%;transform:translateX(-50%);width:min(1180px,92%);display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--text);background:var(--glass-hi);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-bd);border-radius:40px;padding:11px 14px 11px 22px;box-shadow:0 8px 30px rgba(10,4,40,.25);transition:background .4s var(--ease),border-color .4s var(--ease)}
+.nav .lg{font-weight:800;letter-spacing:2px;font-size:15px}
+.nav .lnk{display:flex;gap:20px;align-items:center}
+.nav .lnk a{color:var(--muted);transition:color .2s}.nav .lnk a:hover{color:var(--text)}
+.nav .tog{background:var(--glass);border:1px solid var(--glass-bd);color:var(--text);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px;display:grid;place-items:center}
+.nav .bk{background:var(--cta);color:var(--cta-fg);padding:9px 16px;border-radius:30px;font-weight:800;border:0;cursor:pointer;font-family:inherit;font-size:13px}
+@media(max-width:760px){.nav .lnk a:not(.bk){display:none}}
+#hero{position:relative;min-height:640px;height:100vh;max-height:900px;overflow:hidden;background:var(--hero-bg);transition:background .4s var(--ease)}
+#aurora{position:absolute;inset:-25%;z-index:0;filter:blur(34px);background:radial-gradient(40% 50% at 32% 32%,var(--aurora1),transparent 60%),radial-gradient(46% 56% at 74% 58%,var(--aurora2),transparent 60%),radial-gradient(50% 50% at 56% 82%,var(--aurora3),transparent 60%);animation:aur 16s ease-in-out infinite alternate}
+@keyframes aur{to{transform:translate(4%,-3%) scale(1.12)}}
+#vig{position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 -120px 160px -60px rgba(4,2,14,.6),inset 0 60px 120px -40px rgba(4,2,14,.4)}
+:root[data-theme=light] #vig{box-shadow:inset 0 -120px 160px -70px rgba(200,190,245,.5)}
+#grain{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hero-grid{position:relative;z-index:3;height:100%;max-width:1180px;margin:0 auto;padding:0 6%;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:30px}
+.hero-copy{max-width:560px}
+.hero-copy .eyebrow{margin-bottom:18px;display:block;opacity:0;animation:rise .9s .15s forwards var(--ease)}
+.hero-copy h1{font-size:clamp(38px,6vw,60px);font-weight:800;letter-spacing:-1.6px;text-shadow:0 0 40px rgba(124,58,237,.18);opacity:0;animation:rise 1s .3s forwards var(--ease)}
+.hero-copy .sub{font-size:clamp(15px,2vw,17px);color:var(--muted);margin-top:20px;max-width:460px;opacity:0;animation:rise 1s .5s forwards var(--ease)}
+.hero-row{display:flex;gap:16px;align-items:center;margin-top:32px;flex-wrap:wrap;opacity:0;animation:rise 1s .7s forwards var(--ease)}
+.metric{padding:12px 18px}.metric b{font-size:18px;font-weight:800;display:block}.metric span{font-size:9.5px;color:var(--muted);letter-spacing:1px}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.logo3d{justify-self:center;perspective:1100px;width:min(440px,40vw)}
+.stage{position:relative;transform-style:preserve-3d;animation:float 6s ease-in-out infinite;transition:transform .15s ease-out;will-change:transform}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -16px}}
+.logo-glow{position:absolute;inset:-6% -4%;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;background:#9a4dff;filter:blur(30px);opacity:.6;animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:.78}}
+.logo-img{display:block;width:100%;height:auto;position:relative;border-radius:18px;filter:drop-shadow(0 24px 40px rgba(10,4,40,.55))}
+.logo-shine{position:absolute;inset:0;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.6) 50%,transparent 58%);background-size:300% 100%;animation:sweep 5s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes sweep{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
+.logo-reflect{position:absolute;top:99%;left:0;width:100%;transform:scaleY(-1);opacity:.14;-webkit-mask:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 52%);mask:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 52%)}
+.logo-reflect img{width:100%;display:block;border-radius:18px}
+section{position:relative;padding:120px 0}
+.editorial{display:grid;grid-template-columns:300px 1fr;gap:64px;align-items:start}
+.lead{position:sticky;top:116px}
+.kicker{display:inline-flex;align-items:center;gap:11px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:18px}
+.kicker::before{content:"";width:26px;height:1px;background:var(--accent2);opacity:.55}
+.kicker i{font-style:normal;color:var(--muted)}
+.lead h2{font-size:clamp(26px,3.2vw,36px);font-weight:800;line-height:1.06}
+.lead>p{color:var(--muted);margin-top:16px;font-size:15.5px;max-width:280px}
+.lead .btn{margin-top:24px}
+.list{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:22px;padding:26px 6px;border-top:1px solid var(--glass-bd);transition:background .25s var(--ease),padding .25s var(--ease),border-color .25s var(--ease)}
+.row:last-child{border-bottom:1px solid var(--glass-bd)}
+.row .rn{font-size:13px;font-weight:800;color:var(--accent2);letter-spacing:1px}
+.row .rt h3{font-size:19px;font-weight:700}
+.row .rt p{color:var(--muted);font-size:14.5px;margin-top:4px}
+.row .ra{color:var(--accent2);font-size:18px;opacity:0;transform:translateX(-8px);transition:opacity .25s var(--ease),transform .25s var(--ease)}
+.row:hover{background:var(--glass);border-radius:14px;padding-left:18px;padding-right:18px;border-top-color:transparent}
+.row:hover+.row{border-top-color:transparent}
+.row:hover .ra{opacity:1;transform:none}
+.tags{display:flex;flex-wrap:wrap;gap:12px}
+.tag{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border:1px solid var(--glass-bd);border-radius:30px;font-weight:600;font-size:14.5px;background:var(--glass)}
+.tag .ico{color:var(--accent2);display:grid;place-items:center}
+#problem .offer-band{position:relative;overflow:hidden;padding:58px 56px;border-color:rgba(168,85,247,.35)}
+#problem .offer-band::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 120% at 12% 0%,rgba(168,85,247,.16),transparent 55%);pointer-events:none}
+#problem .kicker,#problem h2,#problem .offer-band p,#problem .btn{position:relative}
+#problem h2{font-size:clamp(28px,3.8vw,42px);font-weight:800;line-height:1.08;max-width:680px}
+#problem .offer-band p{color:var(--muted);font-size:17px;max-width:600px;margin:18px 0 28px}
+.feature{display:grid;grid-template-columns:.82fr 1.18fr;gap:54px;align-items:center}
+.feature-copy h2{font-size:clamp(26px,3.4vw,38px);font-weight:800;line-height:1.08}
+.feature-copy p{color:var(--muted);margin-top:16px;font-size:16px;max-width:360px}
+.dash{padding:0;overflow:hidden}
+.dash-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--glass-bd);font-size:12px;color:var(--muted)}
+.dash-bar .dot{width:10px;height:10px;border-radius:50%;background:var(--glass-bd)}
+.dash-title{margin-left:8px;font-weight:600;color:var(--text)}
+.dash-bar .live{margin-left:auto;color:#33d17a;font-weight:700;font-size:10px;letter-spacing:1px}
+.dash-body{padding:22px}
+.dash-stat{margin-bottom:14px;position:relative}
+.dash-prev{position:absolute;top:0;right:0;font-size:10px;color:var(--muted);opacity:.8;border:1px solid var(--glass-bd);padding:2px 9px;border-radius:20px}
+.dash-lab{font-size:12px;color:var(--muted);letter-spacing:.5px}
+.dash-stat b{font-size:42px;font-weight:800;display:block;line-height:1;margin:6px 0 4px;background:var(--head-grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.dash-trend{font-size:12px;color:var(--accent2);font-weight:700}
+.clipgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:8px 0 0}
+.clip{position:relative;aspect-ratio:9/16;border-radius:8px;overflow:hidden;border:1px solid var(--glass-bd);background:linear-gradient(160deg,rgba(170,150,255,.14),rgba(91,140,255,.06))}
+.clip .thumb{position:absolute;inset:0;background-size:cover;background-position:center}
+.clip .score{position:absolute;top:5px;left:5px;font-size:8px;font-weight:800;color:#fff;background:rgba(168,85,247,.85);padding:2px 5px;border-radius:4px}
+.clip .ratio{position:absolute;bottom:5px;right:5px;font-size:8px;color:#fff;background:rgba(0,0,0,.4);padding:1px 4px;border-radius:3px}
+.clip.more{display:grid;place-items:center;text-align:center;font-size:11px;font-weight:800;color:var(--accent2);background:var(--glass);line-height:1.2}
+@media(max-width:860px){.clipgrid{grid-template-columns:repeat(4,1fr)}}
+#income .note{color:var(--muted);font-size:12.5px;margin-top:18px;opacity:.8}
+.price-wrap{display:flex;justify-content:center}
+.price-card{max-width:460px;width:100%;padding:42px 40px;text-align:center}
+.price-big{font-size:56px;font-weight:800;line-height:1}
+.price-sub{color:var(--muted);font-size:14px;margin:8px 0 24px}
+.price-list{list-style:none;text-align:left;margin:0 0 26px;display:flex;flex-direction:column;gap:11px}
+.price-list li{font-size:14.5px;padding-left:26px;position:relative}
+.price-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent2);font-weight:800}
+.price-aff{display:block;margin-top:16px;color:var(--muted);font-size:13px;text-decoration:underline}
+.price-aff:hover{color:var(--accent2)}
+.book-head{margin-bottom:42px}
+.faq details{padding:4px 24px;margin-bottom:14px}
+.faq summary{list-style:none;cursor:pointer;font-weight:700;font-size:16px;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--accent2);font-size:22px;font-weight:400;transition:transform .25s var(--ease)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{color:var(--muted);font-size:15px;padding:0 0 18px;max-width:660px}
+.faq{max-width:780px;margin:0 auto}
+#cta{padding-top:40px}
+#cta .cta-band{position:relative;overflow:hidden;text-align:center;padding:90px 40px;border-radius:26px;border:1px solid var(--glass-bd);background:linear-gradient(160deg,var(--glass),rgba(170,150,255,.02));box-shadow:var(--shadow)}
+#cta .cta-glow{position:absolute;inset:0;z-index:0;background:radial-gradient(60% 90% at 50% -10%,var(--aurora2),transparent 60%),radial-gradient(55% 80% at 50% 110%,var(--aurora1),transparent 60%);filter:blur(18px);opacity:.8}
+#cta h2{position:relative;font-size:clamp(30px,4.4vw,50px);font-weight:800;letter-spacing:-1px}
+#cta p{position:relative;color:var(--muted);font-size:17px;max-width:520px;margin:16px auto 30px}
+#cta .btn{position:relative}
+footer{padding:60px 0 40px;border-top:1px solid var(--glass-bd)}
+.foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+footer .lg{font-weight:800;letter-spacing:2px;font-size:20px}
+footer .muted{color:var(--muted);font-size:14px;margin-top:10px;max-width:320px}
+footer a{color:var(--muted)}footer a:hover{color:var(--text)}
+.foot-links{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.copyr{color:var(--muted);font-size:12.5px;margin-top:40px;text-align:center;opacity:.8}
+/* buy modal */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(4,2,14,.72);backdrop-filter:blur(6px);padding:20px}
+.modal.open{display:flex}
+.modal-card{position:relative;max-width:460px;width:100%;padding:34px}
+.modal-card h3{font-size:22px;font-weight:800;margin-bottom:12px}
+.modal-card p{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+.modal-card .agree{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:20px;cursor:pointer}
+.modal-card .agree a{color:var(--accent2);text-decoration:underline}
+.modal-card .btn.disabled{opacity:.45;pointer-events:none}
+.modal-close{position:absolute;top:12px;right:16px;background:none;border:0;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+@media(max-width:860px){.editorial{grid-template-columns:1fr;gap:30px}.lead{position:static}.lead>p{max-width:none}.feature{grid-template-columns:1fr;gap:30px}}
+@media(max-width:760px){
+  #hero{height:auto;min-height:0;padding:120px 0 60px}
+  .hero-grid{grid-template-columns:1fr;text-align:center;gap:40px}
+  .hero-copy{max-width:none}.hero-copy .sub{margin-left:auto;margin-right:auto}
+  .hero-row{justify-content:center}
+  .logo3d{width:min(320px,72vw);order:-1}
+  section{padding:78px 0}
+  #problem .offer-band{padding:38px 28px}
+  .foot-grid{flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important}
+  .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .hero-copy .eyebrow,.hero-copy h1,.hero-copy .sub,.hero-row{opacity:1!important}
+}
+</style>
 </head>
 <body>
+<nav class="nav">
+  <span class="lg">GHOSTCLIP</span>
+  <span class="lnk">
+    <a href="#how">How it works</a><a href="#income">Income</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+    <button class="tog" id="tog" aria-label="Toggle light/dark" onclick="toggleTheme()">☾</button>
+    <button class="bk" onclick="openBuy()">Get GhostClip</button>
+  </span>
+</nav>
 
-  <canvas id="particle-canvas"></canvas>
-  <div id="cursor-glow"></div>
-
-  <!-- ── STICKY BOTTOM CTA ── -->
-  <div class="sticky-cta" id="sticky-cta">
-    <span class="sticky-cta-text"><strong>GhostClip</strong> — One-time $49.99</span>
-    <button class="btn btn-pulse sticky-btn" onclick="openLegalModal()">Get Instant Access</button>
-  </div>
-
-  <!-- ── NAV ── -->
-  <nav>
-    <a href="#" class="nav-logo">GHOST<span>CLIP</span></a>
-    <div class="nav-links">
-      <a href="#what">How It Works</a>
-      <a href="#proof">See Results</a>
-      <a href="#testimonials">Reviews</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <button class="btn nav-cta btn-pulse" onclick="openLegalModal()">Get Access — $49.99</button>
-  </nav>
-
-  <!-- ── HERO ── -->
+<main>
   <section id="hero">
-    <div class="hero-orb"></div>
-    <div class="container">
-
-      <div class="fade-up">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          AI-Powered Video Automation
+    <div id="aurora"></div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">The Clipping System · $49.99 once</span>
+        <h1 class="grad-text">Stop clipping<br>by hand.</h1>
+        <p class="sub">One long video → 87+ ready-to-post clips. Runs on your own machine. $49.99, once — no subscription.</p>
+        <div class="hero-row">
+          <button class="btn" onclick="openBuy()">Get GhostClip →</button>
+          <div class="metric glass"><b class="grad-text">1 video → 87 clips</b><span>~7 MINUTES · 9:16 VERTICAL</span></div>
         </div>
       </div>
-
-      <div class="fade-up" style="transition-delay:0.1s">
-        <h1>Stop Clipping<br>Manually. Let<br><span class="grad-text">AI Do It.</span></h1>
-      </div>
-
-      <div class="fade-up" style="transition-delay:0.2s">
-        <p class="hero-sub">
-          Drop in a long-form video. GhostClip transcribes, scores, and exports vertical clips — face-tracked, captioned, and ready to post. No editing app. No timeline. Zero manual work.
-        </p>
-      </div>
-
-      <div class="fade-up hero-cta-group" style="transition-delay:0.3s">
-        <button class="btn btn-lg btn-pulse" onclick="openLegalModal()">Get Instant Access — $49.99</button>
-      </div>
-
-      <div class="fade-up hero-trust" style="transition-delay:0.35s">
-        <span>Lifetime access &nbsp;·&nbsp;</span><span>No subscriptions &nbsp;·&nbsp;</span><span>Runs 100% local — no API fees</span>
-      </div>
-
-      <!-- Stats Bar -->
-      <div class="stats-bar fade-up" style="transition-delay:0.4s">
-        <div class="stat-item">
-          <div class="stat-num" data-count="347">0</div>
-          <div class="stat-label">Buyers</div>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <div class="stat-num" data-count="12400" data-suffix="+">0</div>
-          <div class="stat-label">Clips Generated</div>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <div class="stat-num">4.9★</div>
-          <div class="stat-label">Avg. Rating</div>
+      <div class="logo3d">
+        <div class="stage" id="stage" style="--logo:url(logo.svg)">
+          <div class="logo-glow"></div>
+          <img class="logo-img" src="logo.svg" alt="GhostClip"/>
+          <div class="logo-shine"></div>
+          <div class="logo-reflect"><img src="logo.svg" alt=""/></div>
         </div>
       </div>
-
-      <!-- 3D Phone Mockups -->
-      <div class="phones-row fade-up" style="transition-delay:0.5s">
-
-        <!-- Phone Left -->
-        <div class="phone-wrap">
-          <svg class="phone-svg" width="160" height="300" viewBox="0 0 160 300" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="phoneBodyL" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#1a0d30"/>
-                <stop offset="100%" stop-color="#0d0620"/>
-              </linearGradient>
-              <linearGradient id="screenGradL" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#200a40"/>
-                <stop offset="100%" stop-color="#0a031a"/>
-              </linearGradient>
-              <linearGradient id="clipBarL" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#c77dff"/>
-                <stop offset="100%" stop-color="#7b2fbe"/>
-              </linearGradient>
-            </defs>
-            <rect x="4" y="4" width="152" height="292" rx="22" fill="url(#phoneBodyL)" stroke="rgba(157,78,221,0.5)" stroke-width="1.5"/>
-            <rect x="4" y="4" width="152" height="292" rx="22" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <rect x="14" y="14" width="132" height="272" rx="16" fill="url(#screenGradL)"/>
-            <!-- Content preview -->
-            <rect x="18" y="20" width="124" height="260" rx="14" fill="rgba(157,78,221,0.06)"/>
-            <!-- Caption bar -->
-            <rect x="26" y="200" width="108" height="22" rx="6" fill="rgba(199,125,255,0.15)" stroke="rgba(199,125,221,0.2)" stroke-width="0.5"/>
-            <rect x="36" y="206" width="70" height="6" rx="3" fill="url(#clipBarL)" opacity="0.8"/>
-            <rect x="36" y="215" width="50" height="4" rx="2" fill="rgba(157,78,221,0.3)"/>
-            <!-- Score badge -->
-            <rect x="110" y="36" width="24" height="14" rx="7" fill="rgba(199,125,255,0.2)" stroke="rgba(199,125,255,0.3)" stroke-width="0.5"/>
-            <text x="122" y="46" text-anchor="middle" font-family="Arial" font-size="6" fill="#c77dff" font-weight="bold">91%</text>
-            <!-- Waveform mini -->
-            <g opacity="0.4">
-              <rect x="28" y="240" width="2" height="10" rx="1" fill="#9d4edd"/>
-              <rect x="33" y="236" width="2" height="18" rx="1" fill="#9d4edd"/>
-              <rect x="38" y="242" width="2" height="6" rx="1" fill="#9d4edd"/>
-              <rect x="43" y="237" width="2" height="16" rx="1" fill="#9d4edd"/>
-              <rect x="48" y="244" width="2" height="4" rx="1" fill="#9d4edd"/>
-              <rect x="53" y="235" width="2" height="20" rx="1" fill="#c77dff"/>
-              <rect x="58" y="239" width="2" height="12" rx="1" fill="#9d4edd"/>
-              <rect x="63" y="241" width="2" height="8" rx="1" fill="#9d4edd"/>
-            </g>
-            <!-- Notch -->
-            <rect x="54" y="14" width="52" height="10" rx="5" fill="#0d0620"/>
-            <!-- Glossy shine -->
-            <rect x="14" y="14" width="132" height="70" rx="16" fill="rgba(255,255,255,0.04)"/>
-          </svg>
-        </div>
-
-        <!-- Phone Center (bigger, brighter) -->
-        <div class="phone-wrap phone-center">
-          <svg class="phone-svg" width="190" height="360" viewBox="0 0 190 360" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="phoneBodyC" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#200b3a"/>
-                <stop offset="100%" stop-color="#0e0523"/>
-              </linearGradient>
-              <linearGradient id="screenGradC" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#280c4f"/>
-                <stop offset="100%" stop-color="#0d0420"/>
-              </linearGradient>
-              <linearGradient id="clipBarC" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#c77dff"/>
-                <stop offset="50%" stop-color="#00d4ff"/>
-                <stop offset="100%" stop-color="#7b2fbe"/>
-              </linearGradient>
-              <filter id="phoneGlowC" x="-10%" y="-5%" width="120%" height="110%">
-                <feGaussianBlur stdDeviation="12" result="blur"/>
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-            <!-- Outer glow -->
-            <rect x="6" y="6" width="178" height="348" rx="28" fill="#9d4edd" opacity="0.08" filter="url(#phoneGlowC)"/>
-            <!-- Body -->
-            <rect x="6" y="6" width="178" height="348" rx="28" fill="url(#phoneBodyC)" stroke="rgba(157,78,221,0.6)" stroke-width="1.5"/>
-            <rect x="6" y="6" width="178" height="348" rx="28" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-            <!-- Screen -->
-            <rect x="16" y="16" width="158" height="328" rx="22" fill="url(#screenGradC)"/>
-            <!-- Face-tracking crop indicator -->
-            <rect x="42" y="35" width="106" height="80" rx="6" fill="none" stroke="rgba(199,125,255,0.4)" stroke-width="1" stroke-dasharray="4 3"/>
-            <rect x="42" y="35" width="20" height="2" rx="1" fill="#c77dff"/>
-            <rect x="42" y="35" width="2" height="12" rx="1" fill="#c77dff"/>
-            <rect x="128" y="35" width="20" height="2" rx="1" fill="#c77dff"/>
-            <rect x="146" y="35" width="2" height="12" rx="1" fill="#c77dff"/>
-            <rect x="42" y="113" width="20" height="2" rx="1" fill="#c77dff"/>
-            <rect x="42" y="103" width="2" height="12" rx="1" fill="#c77dff"/>
-            <rect x="128" y="113" width="20" height="2" rx="1" fill="#c77dff"/>
-            <rect x="146" y="103" width="2" height="12" rx="1" fill="#c77dff"/>
-            <text x="56" y="29" font-family="Arial" font-size="7" fill="#c77dff" letter-spacing="1" opacity="0.8">FACE TRACK</text>
-            <!-- Caption -->
-            <rect x="24" y="250" width="142" height="32" rx="8" fill="rgba(199,125,255,0.18)" stroke="rgba(199,125,255,0.25)" stroke-width="0.8"/>
-            <rect x="34" y="258" width="100" height="7" rx="3.5" fill="url(#clipBarC)" opacity="0.9"/>
-            <rect x="34" y="269" width="70" height="5" rx="2.5" fill="rgba(157,78,221,0.35)"/>
-            <!-- Score badge top right -->
-            <rect x="138" y="40" width="30" height="17" rx="8.5" fill="rgba(199,125,255,0.22)" stroke="rgba(199,125,255,0.4)" stroke-width="0.8"/>
-            <text x="153" y="52" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#c77dff" font-weight="bold">97%</text>
-            <!-- AI Score bar bottom -->
-            <text x="28" y="302" font-family="Arial" font-size="8" fill="#7a6b9f" letter-spacing="1">AI SCORE</text>
-            <rect x="28" y="308" width="134" height="5" rx="2.5" fill="rgba(157,78,221,0.12)"/>
-            <rect x="28" y="308" width="126" height="5" rx="2.5" fill="url(#clipBarC)"/>
-            <!-- Waveform -->
-            <g opacity="0.5">
-              <rect x="28" y="320" width="3" height="14" rx="1.5" fill="#9d4edd"/>
-              <rect x="34" y="315" width="3" height="24" rx="1.5" fill="#c77dff"/>
-              <rect x="40" y="322" width="3" height="10" rx="1.5" fill="#9d4edd"/>
-              <rect x="46" y="316" width="3" height="22" rx="1.5" fill="#c77dff"/>
-              <rect x="52" y="324" width="3" height="6"  rx="1.5" fill="#9d4edd"/>
-              <rect x="58" y="313" width="3" height="28" rx="1.5" fill="#c77dff"/>
-              <rect x="64" y="318" width="3" height="18" rx="1.5" fill="#9d4edd"/>
-              <rect x="70" y="320" width="3" height="14" rx="1.5" fill="#9d4edd"/>
-              <rect x="76" y="314" width="3" height="26" rx="1.5" fill="#c77dff"/>
-              <rect x="82" y="321" width="3" height="12" rx="1.5" fill="#9d4edd"/>
-              <rect x="88" y="315" width="3" height="24" rx="1.5" fill="#c77dff"/>
-              <rect x="94" y="323" width="3" height="8"  rx="1.5" fill="#9d4edd"/>
-              <rect x="100" y="312" width="3" height="30" rx="1.5" fill="#c77dff"/>
-              <rect x="106" y="317" width="3" height="20" rx="1.5" fill="#9d4edd"/>
-              <rect x="112" y="319" width="3" height="16" rx="1.5" fill="#9d4edd"/>
-              <rect x="118" y="316" width="3" height="22" rx="1.5" fill="#c77dff"/>
-              <rect x="124" y="321" width="3" height="12" rx="1.5" fill="#9d4edd"/>
-              <rect x="130" y="313" width="3" height="28" rx="1.5" fill="#c77dff"/>
-              <rect x="136" y="318" width="3" height="18" rx="1.5" fill="#9d4edd"/>
-              <rect x="142" y="322" width="3" height="10" rx="1.5" fill="#9d4edd"/>
-              <rect x="148" y="315" width="3" height="24" rx="1.5" fill="#c77dff"/>
-              <rect x="154" y="319" width="3" height="16" rx="1.5" fill="#9d4edd"/>
-            </g>
-            <!-- Status bar bottom -->
-            <rect x="16" y="340" width="158" height="4" rx="2" fill="rgba(157,78,221,0.08)"/>
-            <text x="95" y="353" text-anchor="middle" font-family="Arial" font-size="7" fill="#7a6b9f" letter-spacing="1" opacity="0.7">READY TO POST · 9:16</text>
-            <!-- Notch -->
-            <rect x="67" y="16" width="56" height="12" rx="6" fill="#0e0523"/>
-            <!-- Glossy shine top half -->
-            <rect x="16" y="16" width="158" height="90" rx="22" fill="rgba(255,255,255,0.05)"/>
-          </svg>
-        </div>
-
-        <!-- Phone Right -->
-        <div class="phone-wrap">
-          <svg class="phone-svg" width="160" height="300" viewBox="0 0 160 300" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="phoneBodyR" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#1a0d30"/>
-                <stop offset="100%" stop-color="#0d0620"/>
-              </linearGradient>
-              <linearGradient id="screenGradR" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#200a40"/>
-                <stop offset="100%" stop-color="#0a031a"/>
-              </linearGradient>
-              <linearGradient id="clipBarR" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#00d4ff"/>
-                <stop offset="100%" stop-color="#9d4edd"/>
-              </linearGradient>
-            </defs>
-            <rect x="4" y="4" width="152" height="292" rx="22" fill="url(#phoneBodyR)" stroke="rgba(157,78,221,0.5)" stroke-width="1.5"/>
-            <rect x="4" y="4" width="152" height="292" rx="22" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <rect x="14" y="14" width="132" height="272" rx="16" fill="url(#screenGradR)"/>
-            <rect x="18" y="20" width="124" height="260" rx="14" fill="rgba(0,212,255,0.04)"/>
-            <!-- Caption bar -->
-            <rect x="26" y="200" width="108" height="22" rx="6" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.2)" stroke-width="0.5"/>
-            <rect x="36" y="206" width="80" height="6" rx="3" fill="url(#clipBarR)" opacity="0.8"/>
-            <rect x="36" y="215" width="55" height="4" rx="2" fill="rgba(0,212,255,0.2)"/>
-            <!-- Score -->
-            <rect x="108" y="36" width="26" height="14" rx="7" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.3)" stroke-width="0.5"/>
-            <text x="121" y="46" text-anchor="middle" font-family="Arial" font-size="6" fill="#00d4ff" font-weight="bold">84%</text>
-            <!-- Waveform -->
-            <g opacity="0.35">
-              <rect x="28" y="240" width="2" height="8"  rx="1" fill="#00d4ff"/>
-              <rect x="33" y="235" width="2" height="18" rx="1" fill="#00d4ff"/>
-              <rect x="38" y="241" width="2" height="6"  rx="1" fill="#9d4edd"/>
-              <rect x="43" y="236" width="2" height="16" rx="1" fill="#00d4ff"/>
-              <rect x="48" y="243" width="2" height="4"  rx="1" fill="#9d4edd"/>
-              <rect x="53" y="233" width="2" height="22" rx="1" fill="#00d4ff"/>
-              <rect x="58" y="238" width="2" height="12" rx="1" fill="#9d4edd"/>
-            </g>
-            <!-- Notch -->
-            <rect x="54" y="14" width="52" height="10" rx="5" fill="#0d0620"/>
-            <!-- Glossy shine -->
-            <rect x="14" y="14" width="132" height="70" rx="16" fill="rgba(255,255,255,0.04)"/>
-          </svg>
-        </div>
-
-      </div><!-- /phones-row -->
     </div>
+    <div id="vig"></div><div id="grain"></div>
   </section>
 
-  <!-- ── HOW IT WORKS ── -->
-  <section id="what">
-    <div class="container">
-      <div class="section-title fade-up" style="text-align:center">
-        <div class="section-label">The System</div>
-        <h2>Three Steps. <span class="grad-text">Zero</span> Manual Work.</h2>
-        <div class="glow-line"></div>
-      </div>
-      <div class="cards-grid">
-
-        <div class="card feat-card fade-up" style="transition-delay:0.05s">
-          <div class="feat-step">01</div>
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 1 1 0 18A9 9 0 0 1 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
-          </div>
-          <h3>Drop In Your Video</h3>
-          <p>MP4, MOV, or MKV. Drop it in and run the system. Whisper AI transcribes every word and custom audio energy analysis maps every peak and dead zone in your footage.</p>
-        </div>
-
-        <div class="card feat-card fade-up" style="transition-delay:0.12s">
-          <div class="feat-step">02</div>
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
-          </div>
-          <h3>AI Scores &amp; Ranks</h3>
-          <p>Ollama runs locally on your machine — no API costs ever. Each segment is scored by emotional intensity, keyword density, and energy. Best moments rise to the top automatically.</p>
-        </div>
-
-        <div class="card feat-card fade-up" style="transition-delay:0.2s">
-          <div class="feat-step">03</div>
-          <div class="feat-icon">
-            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 18h6M12 14v4"/></svg>
-          </div>
-          <h3>Post-Ready Clips</h3>
-          <p>Face-tracked 9:16 crop. Filler words removed. Animated captions added. Output is vertical, clean, and ready for TikTok, Reels, or Shorts. Zero editing. Just upload.</p>
-        </div>
-
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="wrap">
+      <div class="offer-band glass reveal">
+        <span class="kicker">The problem</span>
+        <h2 class="grad-text">You're sitting on content you'll never post.</h2>
+        <p>Hours of long-form — podcasts, streams, VODs, talking-head uploads — all of it packed with clips you'll never cut by hand. Manual clipping is slow, boring, and it's costing you the algorithm.</p>
+        <a class="btn" href="#how">See how it works →</a>
       </div>
     </div>
   </section>
 
-  <!-- ── TIKTOK PROOF SECTION ── -->
-  <section id="proof">
-    <div class="container">
-      <div class="proof-header fade-up">
-        <div class="section-label">Real Output</div>
-        <h2>Clips Made With <span class="grad-text">GhostClip</span></h2>
-        <p class="proof-sub">These are actual clips produced by the system — no manual editing, no designer. Just AI automation and a raw video file.</p>
+  <!-- HOW -->
+  <section id="how">
+    <div class="wrap"><div class="editorial">
+      <aside class="lead reveal">
+        <span class="kicker"><i>01</i> How it works</span>
+        <h2 class="grad-text">From one video to a week of content</h2>
+        <p>Three steps. Runs locally. No editing skills needed.</p>
+      </aside>
+      <div class="list">
+        <div class="row reveal"><span class="rn">01</span><div class="rt"><h3>Drop a video</h3><p>Point it at any long video on your machine — a podcast, a stream, a YouTube upload.</p></div><span class="ra">→</span></div>
+        <div class="row reveal"><span class="rn">02</span><div class="rt"><h3>AI does the work</h3><p>It transcribes, scores every moment, and ranks the best — automatically, on your own hardware.</p></div><span class="ra">→</span></div>
+        <div class="row reveal"><span class="rn">03</span><div class="rt"><h3>Export 87+ clips</h3><p>Vertical 9:16, captioned, face-tracked, ready to post everywhere. ~7 minutes.</p></div><span class="ra">→</span></div>
       </div>
-
-      <div class="tiktok-grid">
-
-        <!-- SLOT 1 — Replace VIDEO_ID_1 with your actual TikTok video ID -->
-        <div class="tiktok-slot fade-up" style="transition-delay:0.05s">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_1"
-            data-video-id="VIDEO_ID_1"
-            style="max-width:100%; min-width:0;">
-            <section>
-              <a target="_blank" title="GhostClip Demo Clip" href="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_1">GhostClip Demo</a>
-            </section>
-          </blockquote>
-        </div>
-
-        <!-- SLOT 2 — Replace VIDEO_ID_2 with your actual TikTok video ID -->
-        <div class="tiktok-slot fade-up" style="transition-delay:0.12s">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_2"
-            data-video-id="VIDEO_ID_2"
-            style="max-width:100%; min-width:0;">
-            <section>
-              <a target="_blank" title="GhostClip Demo Clip 2" href="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_2">GhostClip Demo 2</a>
-            </section>
-          </blockquote>
-        </div>
-
-        <!-- SLOT 3 — Replace VIDEO_ID_3 with your actual TikTok video ID -->
-        <div class="tiktok-slot fade-up" style="transition-delay:0.2s">
-          <blockquote class="tiktok-embed"
-            cite="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_3"
-            data-video-id="VIDEO_ID_3"
-            style="max-width:100%; min-width:0;">
-            <section>
-              <a target="_blank" title="GhostClip Demo Clip 3" href="https://www.tiktok.com/@ghostclipai/video/VIDEO_ID_3">GhostClip Demo 3</a>
-            </section>
-          </blockquote>
-        </div>
-
-      </div>
-
-      <p class="proof-note fade-up" style="transition-delay:0.25s">
-        Follow for more clip examples →
-        <a href="https://www.tiktok.com/@ghostclipai" target="_blank" rel="noopener">@ghostclipai on TikTok</a>
-      </p>
-    </div>
-  </section>
-  <!-- TikTok embed script — loads after DOM -->
-  <script async src="https://www.tiktok.com/embed.js"></script>
-
-  <!-- ── WHO IT'S FOR ── -->
-  <section id="who">
-    <div class="container">
-      <div class="fade-up">
-        <div class="section-label">Built For</div>
-        <h2>You've Got Volume. <span class="grad-text">This Handles It.</span></h2>
-      </div>
-      <div class="for-grid">
-
-        <div class="card for-item fade-up" style="transition-delay:0.05s">
-          <div class="for-dot"></div>
-          <div>
-            <h3>Content Clippers</h3>
-            <p>Watching hours of footage to find 60 seconds worth posting? This kills that workflow. Run it, review the top clips, post. Done in minutes.</p>
-          </div>
-        </div>
-
-        <div class="card for-item fade-up" style="transition-delay:0.1s">
-          <div class="for-dot"></div>
-          <div>
-            <h3>WHOP Sellers &amp; Campaign Runners</h3>
-            <p>Volume is revenue. Automate the grind so you can focus on scaling the offer instead of sitting in a video editor for 4 hours.</p>
-          </div>
-        </div>
-
-        <div class="card for-item fade-up" style="transition-delay:0.15s">
-          <div class="for-dot"></div>
-          <div>
-            <h3>Creators &amp; Streamers</h3>
-            <p>You produce long-form — podcasts, streams, YouTube. That's untapped short-form gold. Stop leaving clips on the table.</p>
-          </div>
-        </div>
-
-        <div class="card for-item fade-up" style="transition-delay:0.2s">
-          <div class="for-dot"></div>
-          <div>
-            <h3>Personal Brand Builders</h3>
-            <p>One long video becomes 7–10 clips. Run the system weekly and stay visible without burning out or hiring an editor.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
+    </div></div>
   </section>
 
-  <!-- ── TESTIMONIALS ── -->
-  <section id="testimonials">
-    <div class="container">
-      <div class="section-title fade-up" style="text-align:center">
-        <div class="section-label">Real Results</div>
-        <h2>What Buyers Are <span class="grad-text">Saying</span></h2>
-        <div class="glow-line"></div>
+  <!-- DEMO -->
+  <section id="system">
+    <div class="wrap"><div class="feature">
+      <div class="feature-copy reveal">
+        <span class="kicker">The demo</span>
+        <h2 class="grad-text">One video in.<br>87 clips out.</h2>
+        <p>Point it at any long video. ~7 minutes later you've got a folder of vertical, captioned, ready-to-post clips.</p>
       </div>
-      <div class="testi-grid">
-
-        <div class="card testi-card fade-up" style="transition-delay:0.05s">
-          <div class="testi-stars">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"I was clipping manually for 3 clients — 4–5 hours per video. Set this up in under an hour and ran my first batch. Got 9 clips out of a 45-minute stream. Zero editing."</p>
-          <div class="testi-author">
-            <div class="testi-avatar">JM</div>
-            <div>
-              <div class="testi-name">Jake M.</div>
-              <div class="testi-handle">Content Clipper · WHOP Seller</div>
-            </div>
+      <div class="dash glass reveal">
+        <div class="dash-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dash-title">GhostClip — clipping…</span><span class="live">● DONE</span></div>
+        <div class="dash-body">
+          <div class="dash-stat"><span class="dash-prev">Example</span><span class="dash-lab">Clips from one video</span><b class="count" data-to="87">0</b><span class="dash-trend">▲ ~7 min · 9:16 vertical · captioned</span></div>
+          <div class="clipgrid">
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t01.jpg)"></div><span class="score">AI 94</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t02.jpg)"></div><span class="score">AI 91</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t03.jpg)"></div><span class="score">AI 89</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t04.jpg)"></div><span class="score">AI 88</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t05.jpg)"></div><span class="score">AI 86</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t06.jpg)"></div><span class="score">AI 85</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t07.jpg)"></div><span class="score">AI 83</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t08.jpg)"></div><span class="score">AI 82</span><span class="ratio">9:16</span></div>
+            <div class="clip"><div class="thumb" style="background-image:url(thumbs/t09.jpg)"></div><span class="score">AI 80</span><span class="ratio">9:16</span></div>
+            <div class="clip more">+78<br>more</div>
           </div>
         </div>
-
-        <div class="card testi-card fade-up" style="transition-delay:0.12s">
-          <div class="testi-stars">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"Thought I'd need to be technical to run this. Setup guide was so clear — had it running same day. The AI scoring actually works, the top clips it picks are legitimately the best moments."</p>
-          <div class="testi-author">
-            <div class="testi-avatar">AT</div>
-            <div>
-              <div class="testi-name">Aisha T.</div>
-              <div class="testi-handle">Podcast Creator · 48K TikTok</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card testi-card fade-up" style="transition-delay:0.2s">
-          <div class="testi-stars">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"Went from 0 shorts a week to 7–10. I do weekly YouTube long-form and was barely posting shorts. Now I batch clip on Sunday. The ROI on $49 is insane — paid for itself first week."</p>
-          <div class="testi-author">
-            <div class="testi-avatar">DR</div>
-            <div>
-              <div class="testi-name">Dylan R.</div>
-              <div class="testi-handle">Personal Brand · YouTube 22K</div>
-            </div>
-          </div>
-        </div>
-
       </div>
-    </div>
+    </div></div>
   </section>
 
-  <!-- ── WHAT'S INCLUDED ── -->
+  <!-- INCOME -->
+  <section id="income">
+    <div class="wrap"><div class="editorial">
+      <aside class="lead reveal">
+        <span class="kicker"><i>02</i> Three ways it pays</span>
+        <h2 class="grad-text">One tool. Three income angles.</h2>
+        <p>However you make content money, volume is the unlock.</p>
+      </aside>
+      <div>
+        <div class="list">
+          <div class="row reveal"><span class="rn">WHOP</span><div class="rt"><h3>Faceless volume play</h3><p>WHOP pays per 1,000 views, so volume is the game — not virality. One video → 87 clips makes the math possible. No face, no niche, no experience.</p></div></div>
+          <div class="row reveal"><span class="rn">YT</span><div class="rt"><h3>Creators &amp; podcasters</h3><p>Sitting on hours of long-form? Turn one upload into a week of shorts for every platform at once.</p></div></div>
+          <div class="row reveal"><span class="rn">$15</span><div class="rt"><h3>Affiliates</h3><p>Promote it, earn ~$15 per sale. A $49.99 impulse price with no subscription to cancel = every sale sticks.</p></div></div>
+        </div>
+        <p class="note">Figures are illustrative examples of the model, not income guarantees.</p>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- INCLUDED -->
   <section id="included">
-    <div class="container">
-      <div class="included-wrap">
-        <div class="included-text fade-up">
-          <div class="section-label">What You Get</div>
-          <h2>Everything You Need.<br><span>Nothing You Don't.</span></h2>
-          <p style="margin-top:18px">Complete, ready-to-run system. One-click installer handles everything — Python, FFmpeg, n8n, Ollama. You're clipping on day one. No subscriptions, no upsells, yours forever.</p>
-        </div>
-        <ul class="included-list fade-up" style="transition-delay:0.1s">
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            Full GhostClip System (one-click installer)
-          </li>
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            Auto-installs Python, FFmpeg, n8n + Ollama
-          </li>
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            n8n workflow with face-tracking, captions, filler removal
-          </li>
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            Step-by-step setup guide (written + annotated)
-          </li>
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            Email support — if you're stuck, we'll fix it
-          </li>
-          <li>
-            <span class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
-            Lifetime access — updates included, no extra charge
-          </li>
-        </ul>
-      </div>
-    </div>
+    <div class="wrap"><div class="editorial">
+      <aside class="lead reveal"><span class="kicker"><i>03</i> What's included</span><h2 class="grad-text">Everything in the box</h2><p>One purchase. No add-ons, no API bills.</p></aside>
+      <div><div class="tags reveal">
+        <span class="tag">Local AI clipping</span><span class="tag">Vertical 9:16 export</span><span class="tag">Auto captions</span><span class="tag">Face tracking</span><span class="tag">AI moment scoring</span><span class="tag">Lifetime updates</span><span class="tag">Bundled fonts</span><span class="tag">No API costs</span>
+      </div></div>
+    </div></div>
   </section>
 
-  <!-- ── SYSTEM REQUIREMENTS ── -->
+  <!-- REQUIREMENTS -->
   <section id="requirements">
-    <div class="container">
-      <div class="fade-up" style="text-align:center">
-        <div class="section-label">Requirements</div>
-        <h2>What You Need to <span style="color:var(--lavender)">Run It</span></h2>
-        <p style="color:var(--muted);margin-top:14px;font-size:0.95rem;max-width:480px;margin-left:auto;margin-right:auto">Runs locally on your machine. No cloud, no API bills, no data leaving your system.</p>
+    <div class="wrap"><div class="editorial">
+      <aside class="lead reveal"><span class="kicker"><i>04</i> Requirements</span><h2 class="grad-text">What you need to run it</h2><p>It runs on your own machine — your files never leave it.</p></aside>
+      <div><div class="tags reveal">
+        <span class="tag">Windows 10/11 or macOS 12+</span><span class="tag">Python 3.10+</span><span class="tag">Ollama</span><span class="tag">8GB RAM</span>
+      </div></div>
+    </div></div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="wrap">
+      <div class="book-head lead reveal" style="position:static">
+        <span class="kicker"><i>—</i> Pricing</span>
+        <h2 class="grad-text">One price. Yours forever.</h2>
+        <p style="max-width:520px">No subscription. No API costs. Buy once, use it forever.</p>
       </div>
-      <div class="card req-card fade-up" style="transition-delay:0.1s">
-        <div class="req-card-inner">
-          <div class="req-item">
-            <div class="req-label">OS</div>
-            <div class="req-value">Windows 10/11 or macOS 12+</div>
-          </div>
-          <div class="req-item">
-            <div class="req-label">RAM</div>
-            <div class="req-value">8GB min · 16GB recommended</div>
-          </div>
-          <div class="req-item">
-            <div class="req-label">Disk</div>
-            <div class="req-value">~2GB for dependencies</div>
-          </div>
-          <div class="req-item">
-            <div class="req-label">Python</div>
-            <div class="req-value">3.10+ (auto-installed)</div>
-          </div>
-          <div class="req-item">
-            <div class="req-label">Ollama</div>
-            <div class="req-value">Free · auto-installed</div>
-          </div>
-          <div class="req-item">
-            <div class="req-label">Internet</div>
-            <div class="req-value">Setup only · runs offline after</div>
-          </div>
+      <div class="price-wrap">
+        <div class="price-card glass reveal">
+          <div class="price-big grad-text">$49.99</div>
+          <div class="price-sub">one-time · lifetime updates · no subscription</div>
+          <ul class="price-list">
+            <li>1 video → 87+ clips, automatically</li>
+            <li>Runs locally — your machine, your files</li>
+            <li>Vertical 9:16, captioned, face-tracked</li>
+            <li>Works on Windows &amp; macOS</li>
+          </ul>
+          <button class="btn" onclick="openBuy()" style="width:100%;justify-content:center">Get GhostClip →</button>
+          <a class="price-aff" href="https://whop.com/ghostclip/" target="_blank" rel="noopener">Want to sell it instead? Earn ~$15 per sale →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ── FAQ ── -->
+  <!-- FAQ -->
   <section id="faq">
-    <div class="container">
-      <div class="fade-up" style="text-align:center">
-        <div class="section-label">Common Questions</div>
-        <h2>Got Questions? <span style="color:var(--lavender)">We've Got Answers.</span></h2>
+    <div class="wrap"><div class="editorial">
+      <aside class="lead reveal"><span class="kicker"><i>05</i> FAQ</span><h2 class="grad-text">Questions, answered</h2><p>Everything worth knowing before you buy.</p></aside>
+      <div class="faq" style="margin:0">
+        <details class="glass reveal" open><summary>Is it a subscription?</summary><p>No. It's $49.99 once — lifetime updates, no monthly fees, no API costs.</p></details>
+        <details class="glass reveal"><summary>Does it run in the cloud?</summary><p>No. GhostClip runs fully on your own machine. Your videos never get uploaded anywhere.</p></details>
+        <details class="glass reveal"><summary>What do I need to run it?</summary><p>Windows 10/11 or macOS 12+, Python 3.10+, Ollama, and 8GB of RAM.</p></details>
+        <details class="glass reveal"><summary>Do I need to show my face?</summary><p>No. It works on any long video — faceless-friendly, perfect for the WHOP volume play.</p></details>
+        <details class="glass reveal"><summary>How do I get it after buying?</summary><p>Checkout is through Whop. You download a ZIP and run one file — the whole environment sets itself up.</p></details>
       </div>
-      <div class="faq-list fade-up" style="transition-delay:0.1s">
-
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            Do I need to know how to code?
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">No coding required. The one-click installer handles everything — Python, FFmpeg, n8n, Ollama. Double-click and walk away. If you can follow numbered steps, you can run this.</div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            What is Ollama and why do I need it?
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">Ollama runs AI models locally on your machine — no cloud, no monthly fees. The AI scoring runs on your computer without sending your video anywhere. It installs automatically with GhostClip.</div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            What video formats does it support?
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">MP4, MOV, MKV — the most common formats from YouTube downloads, screen recordings, and cameras. If you're pulling content from YouTube or a stream VOD, you're covered.</div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            How long does it take to process a video?
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">Roughly 10–20 minutes for a 1-hour video, depending on your machine. You run it, walk away, come back to finished clips. Most of the time it's processing in the background while you do other things.</div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" onclick="toggleFaq(this)">
-            Are refunds available?
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">All sales are final — this is a digital product delivered immediately. If you hit a setup issue, email support is included and we'll personally help you get it working. Please review the requirements before buying.</div></div>
-        </div>
-
-      </div>
-    </div>
+    </div></div>
   </section>
 
-  <!-- ── FINAL CTA ── -->
+  <!-- CLOSING CTA -->
   <section id="cta">
-    <div class="container">
-      <div class="cta-card fade-up">
-        <div class="section-label">One-Time Price</div>
-        <h2>Stop Watching Hours.<br><span class="grad-text">Start Posting Clips.</span></h2>
-        <div class="price-line">
-          <span class="price-strike">$149</span>
-          <span class="price-main">$49.99</span>
-        </div>
-        <p class="urgency"><strong>Lifetime access.</strong> No subscriptions. No upsells. No API fees. Pay once, clip forever.</p>
-        <button class="btn btn-lg btn-pulse" onclick="openLegalModal()">Get Instant Access — $49.99</button>
-        <div class="cta-perks">
-          <span class="cta-perk">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Instant delivery
-          </span>
-          <span class="cta-perk">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            No monthly fees
-          </span>
-          <span class="cta-perk">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Runs 100% local
-          </span>
-          <span class="cta-perk">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Email support included
-          </span>
-        </div>
-        <p style="margin-top:20px;font-size:0.78rem;color:var(--dimmed)">Requires Mac or Windows desktop/laptop. Does not run on mobile.</p>
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <div class="cta-glow"></div>
+        <h2 class="grad-text">Stop watching hours.<br>Start posting clips.</h2>
+        <p>87+ clips from one video. Runs on your machine. $49.99, once.</p>
+        <button class="btn" onclick="openBuy()">Get GhostClip →</button>
       </div>
     </div>
   </section>
+</main>
 
-  <!-- ── FOOTER ── -->
-  <footer>
-    <span>© 2026 Jano Prestige Flow. All rights reserved.</span>
-    <a href="terms.html">Terms &amp; Conditions</a>
-    <a href="#">Privacy Policy</a>
-  </footer>
-
-  <!-- ── LEGAL MODAL ── -->
-  <div id="legal-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(2,1,8,0.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:16px;">
-    <div style="background:#0c0819; border:1px solid rgba(157,78,221,0.28); border-radius:24px; max-width:540px; width:100%; padding:44px 40px; box-shadow:0 0 100px rgba(107,33,168,0.3), inset 0 1px 0 rgba(255,255,255,0.07); max-height:90vh; overflow-y:auto; position:relative;">
-
-      <button onclick="closeLegalModal()" style="position:absolute; top:18px; right:22px; background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='#eef2ff'" onmouseout="this.style.color='#7a6b9f'">&times;</button>
-
-      <p style="font-size:0.7rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#9d4edd; margin-bottom:10px;">Before You Proceed</p>
-      <h2 style="font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:0.04em; color:#f0eaff; margin-bottom:8px;">Purchase Agreement</h2>
-      <p style="color:#7a6b9f; font-size:0.88rem; margin-bottom:28px;">Please read and accept the following terms before completing your purchase.</p>
-
-      <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:28px;">
-
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <span style="flex-shrink:0; width:22px; height:22px; border-radius:50%; background:rgba(157,78,221,0.12); border:1px solid rgba(157,78,221,0.3); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#c77dff; margin-top:2px; font-weight:700;">✕</span>
-          <p style="font-size:0.9rem; color:#bdb4d9; line-height:1.65;"><strong style="color:#f0eaff;">All sales are final.</strong> GhostClip is a digital product. No refunds will be issued under any circumstance — including change of mind or inability to use the product.</p>
-        </div>
-
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <span style="flex-shrink:0; width:22px; height:22px; border-radius:50%; background:rgba(157,78,221,0.12); border:1px solid rgba(157,78,221,0.3); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#c77dff; margin-top:2px;">!</span>
-          <p style="font-size:0.9rem; color:#bdb4d9; line-height:1.65;"><strong style="color:#f0eaff;">No guarantee of results.</strong> Outcomes depend entirely on your content, effort, and consistency. Jano Prestige Flow makes no income or growth guarantees.</p>
-        </div>
-
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <span style="flex-shrink:0; width:22px; height:22px; border-radius:50%; background:rgba(157,78,221,0.12); border:1px solid rgba(157,78,221,0.3); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#c77dff; margin-top:2px;">⊘</span>
-          <p style="font-size:0.9rem; color:#bdb4d9; line-height:1.65;"><strong style="color:#f0eaff;">Personal license only.</strong> You may not resell, share, or redistribute these files. One purchase = one user.</p>
-        </div>
-
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <span style="flex-shrink:0; width:22px; height:22px; border-radius:50%; background:rgba(157,78,221,0.12); border:1px solid rgba(157,78,221,0.3); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#c77dff; margin-top:2px;">§</span>
-          <p style="font-size:0.9rem; color:#bdb4d9; line-height:1.65;"><strong style="color:#f0eaff;">No liability.</strong> Jano Prestige Flow is not liable for any damages, data loss, or issues arising from use. Governed by Ontario, Canada law.</p>
-        </div>
-
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="lg grad-text">GHOSTCLIP</div>
+        <div class="muted">The Clipping System. Turn one long video into 87+ ready-to-post clips — automatically, on your own machine.</div>
       </div>
-
-      <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer; margin-bottom:24px; padding:16px; background:rgba(157,78,221,0.06); border:1px solid rgba(157,78,221,0.15); border-radius:12px;">
-        <input type="checkbox" id="legal-agree" onchange="toggleCheckout()" style="width:18px; height:18px; margin-top:2px; accent-color:#9d4edd; flex-shrink:0; cursor:pointer;" />
-        <span style="font-size:0.88rem; color:#c4b5e0; line-height:1.55;">I have read and agree to the <a href="terms.html" target="_blank" style="color:#c77dff; text-decoration:underline;">Terms &amp; Conditions</a>. I understand all sales are final and no refunds will be issued.</span>
-      </label>
-
-      <button id="checkout-btn" onclick="proceedToCheckout()" disabled style="width:100%; background:linear-gradient(135deg,#c77dff 0%,#7b2fbe 60%,#3a0070 100%); color:#fff; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:700; padding:18px 32px; border-radius:100px; border:none; cursor:not-allowed; opacity:0.4; transition:opacity 0.2s, box-shadow 0.2s; letter-spacing:0.02em; position:relative; overflow:hidden;">
-        <span style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.14) 0%,transparent 55%);border-radius:inherit;pointer-events:none;"></span>
-        Proceed to Checkout — $49.99
-      </button>
-      <p style="text-align:center; margin-top:14px; font-size:0.76rem; color:#4a3d6a;">Secured by Whop · Instant delivery after payment</p>
-
+      <div class="foot-links">
+        <a href="#how">How it works</a><a href="#income">Income</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="terms.html">Terms</a>
+      </div>
+      <div class="foot-links">
+        <button class="bk" onclick="openBuy()" style="margin-bottom:6px">Get GhostClip</button>
+        <button class="tog" onclick="toggleTheme()" aria-label="Toggle theme" style="background:var(--glass);border:1px solid var(--glass-bd);color:var(--text);width:34px;height:34px;border-radius:50%;cursor:pointer">☾</button>
+      </div>
     </div>
+    <div class="copyr">© 2026 GhostClip · The Clipping System</div>
   </div>
+</footer>
 
-  <!-- ── SCRIPTS ── -->
-  <script>
-    /* ── Intersection Observer (scroll reveal) ── */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+<!-- BUY MODAL (legal gate -> Whop) -->
+<div id="buyModal" class="modal" aria-hidden="true">
+  <div class="modal-card glass">
+    <button class="modal-close" onclick="closeBuy()" aria-label="Close">×</button>
+    <h3 class="grad-text">Before you buy</h3>
+    <p>GhostClip is a one-time <b>$49.99</b> purchase delivered via Whop. By continuing you agree to the purchase agreement &amp; <a href="terms.html" target="_blank" rel="noopener">terms</a>.</p>
+    <label class="agree"><input type="checkbox" id="agreeChk"/> I have read and agree to the terms.</label>
+    <a id="whopBtn" class="btn disabled" href="https://whop.com/ghostclip/" target="_blank" rel="noopener" aria-disabled="true" style="width:100%;justify-content:center">Continue to checkout →</a>
+  </div>
+</div>
 
-    /* ── Sticky CTA visibility ── */
-    const stickyCtaEl = document.getElementById('sticky-cta');
-    const heroSection = document.getElementById('hero');
-    const heroObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) stickyCtaEl.classList.add('visible');
-        else stickyCtaEl.classList.remove('visible');
-      });
-    }, { threshold: 0.1 });
-    heroObserver.observe(heroSection);
+<script>
+function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var next=cur==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('gc-theme',next);syncTog();}
+function syncTog(){var t=document.documentElement.getAttribute('data-theme');document.querySelectorAll('.tog').forEach(function(b){b.textContent=t==='light'?'☀':'☾';});}
+syncTog();
+matchMedia('(prefers-color-scheme: light)').addEventListener('change',function(e){if(!localStorage.getItem('gc-theme')){document.documentElement.setAttribute('data-theme',e.matches?'light':'dark');syncTog();}});
 
-    /* ── Counter animation ── */
-    function animateCounter(el) {
-      const target = parseInt(el.dataset.count, 10);
-      const suffix = el.dataset.suffix || '';
-      const duration = 1800;
-      const step = target / (duration / 16);
-      let current = 0;
-      const timer = setInterval(() => {
-        current = Math.min(current + step, target);
-        el.textContent = Math.floor(current).toLocaleString() + suffix;
-        if (current >= target) clearInterval(timer);
-      }, 16);
-    }
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          animateCounter(e.target);
-          counterObserver.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+function openBuy(){var m=document.getElementById('buyModal');m.classList.add('open');m.setAttribute('aria-hidden','false');}
+function closeBuy(){var m=document.getElementById('buyModal');m.classList.remove('open');m.setAttribute('aria-hidden','true');}
+document.getElementById('agreeChk').addEventListener('change',function(e){var b=document.getElementById('whopBtn');if(e.target.checked){b.classList.remove('disabled');b.setAttribute('aria-disabled','false');}else{b.classList.add('disabled');b.setAttribute('aria-disabled','true');}});
+document.getElementById('buyModal').addEventListener('click',function(e){if(e.target.id==='buyModal')closeBuy();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeBuy();});
 
-    /* ── FAQ toggle ── */
-    function toggleFaq(btn) {
-      const item = btn.closest('.faq-item');
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    }
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(RM){document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in')});}
+else{var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(e){io.observe(e)});}
 
-    /* ── Modal ── */
-    function openLegalModal() {
-      const m = document.getElementById('legal-modal');
-      m.style.display = 'flex';
-      document.getElementById('legal-agree').checked = false;
-      toggleCheckout();
-    }
-    function closeLegalModal() {
-      document.getElementById('legal-modal').style.display = 'none';
-    }
-    function toggleCheckout() {
-      const btn = document.getElementById('checkout-btn');
-      const checked = document.getElementById('legal-agree').checked;
-      btn.disabled = !checked;
-      btn.style.opacity = checked ? '1' : '0.4';
-      btn.style.cursor = checked ? 'pointer' : 'not-allowed';
-      if (checked) btn.style.boxShadow = '0 0 40px rgba(157,78,221,0.5)';
-      else btn.style.boxShadow = 'none';
-    }
-    function proceedToCheckout() {
-      if (!document.getElementById('legal-agree').checked) return;
-      window.open('https://whop.com/ghostclip/', '_blank');
-    }
-    document.getElementById('legal-modal').addEventListener('click', function(e) {
-      if (e.target === this) closeLegalModal();
-    });
+function countUp(el){var to=+el.dataset.to,start=null,dur=1500;function step(t){if(!start)start=t;var p=Math.min((t-start)/dur,1);el.textContent=Math.floor((1-Math.pow(1-p,3))*to);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+var cio=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){countUp(en.target);cio.unobserve(en.target);}})},{threshold:.5});
+document.querySelectorAll('.count').forEach(function(e){if(RM){e.textContent=e.dataset.to;}else{cio.observe(e);}});
 
-    /* ── Cursor glow ── */
-    const cursorGlow = document.getElementById('cursor-glow');
-    let mx = -9999, my = -9999;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    (function tickCursor() {
-      cursorGlow.style.left = mx + 'px';
-      cursorGlow.style.top  = my + 'px';
-      requestAnimationFrame(tickCursor);
-    })();
-
-    /* ── 3D card tilt ── */
-    document.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const cx = (e.clientX - r.left) / r.width  - 0.5;
-        const cy = (e.clientY - r.top)  / r.height - 0.5;
-        card.style.transform = `rotateY(${cx * 10}deg) rotateX(${-cy * 10}deg) translateZ(8px)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-        card.style.transition = 'transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease';
-      });
-      card.addEventListener('mouseenter', () => {
-        card.style.transition = 'transform 0.1s ease, box-shadow 0.2s ease';
-      });
-    });
-
-    /* ── Particle system ── */
-    (function() {
-      const canvas = document.getElementById('particle-canvas');
-      const ctx    = canvas.getContext('2d');
-      let W, H, particles = [];
-      const COUNT = 55, CONNECT = 120;
-
-      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-      window.addEventListener('resize', resize);
-      resize();
-
-      function rand(a, b) { return Math.random() * (b - a) + a; }
-
-      for (let i = 0; i < COUNT; i++) {
-        particles.push({
-          x: rand(0, W), y: rand(0, H),
-          vx: rand(-0.18, 0.18), vy: rand(-0.18, 0.18),
-          r: rand(1, 2.2),
-          color: Math.random() > 0.5 ? '157,78,221' : '0,212,255'
-        });
-      }
-
-      function draw() {
-        ctx.clearRect(0, 0, W, H);
-        for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-          if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${p.color},0.55)`;
-          ctx.fill();
-          for (let j = i + 1; j < particles.length; j++) {
-            const q = particles[j];
-            const dx = p.x - q.x, dy = p.y - q.y;
-            const d = Math.sqrt(dx*dx + dy*dy);
-            if (d < CONNECT) {
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
-              ctx.strokeStyle = `rgba(157,78,221,${(1 - d/CONNECT) * 0.18})`;
-              ctx.lineWidth = 0.8;
-              ctx.stroke();
-            }
-          }
-        }
-        requestAnimationFrame(draw);
-      }
-      draw();
-    })();
-  </script>
-
+if(!RM){var hero=document.getElementById('hero'),stage=document.getElementById('stage'),rx=0,ry=0,tx=0,ty=0;
+  hero.addEventListener('mousemove',function(e){var r=hero.getBoundingClientRect();tx=((e.clientX-r.left)/r.width-.5);ty=((e.clientY-r.top)/r.height-.5);});
+  hero.addEventListener('mouseleave',function(){tx=0;ty=0;});
+  (function spin(){requestAnimationFrame(spin);rx+=(tx-rx)*.06;ry+=(ty-ry)*.06;stage.style.transform='rotateY('+(rx*16)+'deg) rotateX('+(-ry*14)+'deg)';})();}
+</script>
 </body>
 </html>
