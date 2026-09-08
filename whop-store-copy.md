@@ -52,4 +52,4 @@ All sales are final (digital product). Read the requirements before buying.
 
 ## Links
 - Site: https://flicclips.pages.dev
-- Store route: currently `whop.com/ghostclip/`. If changed to `flicclips`, update `index.html` (2 links) and `~/GhostClip/whop-poster/config.json` (`whopUrl`, `affiliateUrl`).
+- Store route: currently `whop.com/ghostclip/`. If changed to `flicclips`, update `index.html` (2 links) and `~/FLIC/whop-poster/config.json` (`whopUrl`, `affiliateUrl`).

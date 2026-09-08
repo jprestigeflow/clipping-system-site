@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rebuild `jprestigeflow/clipping-system-site` (`ghostclipofficial.pages.dev`) in JPF's luxury aesthetic — blue base + purple accent, dual-mode, glassmorphism, editorial layout, animated ghost-logo hero — selling the $49.99 GhostClip tool via the existing Whop checkout + legal-gate modal.
+**Goal:** Rebuild `jprestigeflow/flic-site` (`ghostclipofficial.pages.dev`) in JPF's luxury aesthetic — blue base + purple accent, dual-mode, glassmorphism, editorial layout, animated ghost-logo hero — selling the $49.99 GhostClip tool via the existing Whop checkout + legal-gate modal.
 
 **Architecture:** Single-file `index.html` (inline CSS+JS, no build), ported from the shipped JPF site `~/Desktop/Projects/JPF/index.html`. Re-skin tokens to blue+purple, swap content to the product, swap the hero logo to the GhostClip ghost, and preserve the legal-agreement modal that gates the Whop checkout link. Deploy via the repo's pre-push wrangler hook.
 
@@ -61,18 +61,18 @@ Theme key: `gc-theme`. Mask var stays `--logo:url(logo.png)`.
 
 - [ ] **Step 1: Branch + snapshot legacy**
 ```bash
-cd ~/Desktop/Projects/clipping-system-site
+cd ~/Desktop/Projects/flic-site
 git checkout -b rebuild-luxury && cp index.html index.legacy.html && git add index.legacy.html && git commit -m "chore: snapshot legacy GhostClip site"
 ```
 - [ ] **Step 2: Produce `logo.png` from the ghost SVG** (transparent, ~760px wide):
 ```bash
-command -v rsvg-convert >/dev/null && rsvg-convert -w 760 ~/Downloads/ghostclip-logo.svg -o ~/Desktop/Projects/clipping-system-site/logo.png || qlmanage -t -s 760 -o /tmp ~/Downloads/ghostclip-logo.svg && cp /tmp/ghostclip-logo.svg.png ~/Desktop/Projects/clipping-system-site/logo.png
-ls -la ~/Desktop/Projects/clipping-system-site/logo.png
+command -v rsvg-convert >/dev/null && rsvg-convert -w 760 ~/Downloads/ghostclip-logo.svg -o ~/Desktop/Projects/flic-site/logo.png || qlmanage -t -s 760 -o /tmp ~/Downloads/ghostclip-logo.svg && cp /tmp/ghostclip-logo.svg.png ~/Desktop/Projects/flic-site/logo.png
+ls -la ~/Desktop/Projects/flic-site/logo.png
 ```
 Note: the SVG has a dark `#08080f` rounded-rect background; if the PNG isn't transparent, that's acceptable (the dark plate reads fine on the dark hero) — but prefer transparent. If neither tool exists, render via Playwright (`browser_navigate` to the svg over http, screenshot the element).
 - [ ] **Step 3: Check for real clip thumbnails** for the demo:
 ```bash
-ls ~/ghostclip-render/public/thumbs/ 2>/dev/null | head; ls ~/GhostClip/**/thumbs* 2>/dev/null | head
+ls ~/jpf-render/public/thumbs/ 2>/dev/null | head; ls ~/FLIC/**/thumbs* 2>/dev/null | head
 ```
 Record whether usable thumbnails exist (Task 5 decides real vs CSS placeholders).
 
@@ -82,7 +82,7 @@ Record whether usable thumbnails exist (Task 5 decides real vs CSS placeholders)
 
 - [ ] **Step 1: Copy the shipped JPF site as the starting point**
 ```bash
-cp ~/Desktop/Projects/JPF/index.html ~/Desktop/Projects/clipping-system-site/index.html
+cp ~/Desktop/Projects/JPF/index.html ~/Desktop/Projects/flic-site/index.html
 ```
 - [ ] **Step 2: Replace the two `:root` token blocks** with the GhostClips blue+purple tokens from the Palette section above (dark + light). Keep all other CSS identical.
 - [ ] **Step 3: Update `<head>`** — title `GhostClip — Turn 1 video into 87 clips`, meta description (the product one-liner), keep Plus Jakarta Sans + `logo.png` favicon.
@@ -91,7 +91,7 @@ cp ~/Desktop/Projects/JPF/index.html ~/Desktop/Projects/clipping-system-site/ind
 
 **Verify recipe (use in every frontend task):**
 ```bash
-cd ~/Desktop/Projects/clipping-system-site && (python3 -m http.server 8891 >/tmp/gc.log 2>&1 &) ; sleep 1
+cd ~/Desktop/Projects/flic-site && (python3 -m http.server 8891 >/tmp/gc.log 2>&1 &) ; sleep 1
 ```
 Then Playwright: navigate `http://localhost:8891/index.html`; `browser_evaluate` to set `data-theme` and force `document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'))` and `.count` text before fullPage screenshots; check `browser_console_messages` (errors = 0).
 
@@ -227,7 +227,7 @@ document.getElementById('buyModal').addEventListener('click',function(e){if(e.ta
 
 - [ ] **Step 1: Merge to main**
 ```bash
-cd ~/Desktop/Projects/clipping-system-site && git checkout main && git merge --no-ff rebuild-luxury -m "rebuild: GhostClips luxury aesthetic"
+cd ~/Desktop/Projects/flic-site && git checkout main && git merge --no-ff rebuild-luxury -m "rebuild: GhostClips luxury aesthetic"
 ```
 - [ ] **Step 2: Deploy.** Push triggers the repo's pre-push wrangler hook:
 ```bash

@@ -2,8 +2,8 @@
 
 **Date:** 2026-06-15
 **Product:** GhostClips / "The Clipping System" — local AI video clipping tool, $49.99 one-time
-**Repo:** `jprestigeflow/clipping-system-site` → live at `ghostclipofficial.pages.dev` (Cloudflare Pages)
-**Local:** `~/Desktop/Projects/clipping-system-site/` (re-cloned; previous local copy was trashed)
+**Repo:** `jprestigeflow/flic-site` → live at `ghostclipofficial.pages.dev` (Cloudflare Pages)
+**Local:** `~/Desktop/Projects/flic-site/` (re-cloned; previous local copy was trashed)
 **Status:** Approved direction — proceeding to implementation plan
 
 ---
@@ -48,7 +48,7 @@ Use the **GhostClips logo** (`~/Downloads/ghostclip-logo.svg` — purple ghost +
 1. **Hero (LOCKED treatment)** — glass nav (GHOSTCLIP + Get button + theme toggle) · animated purple ghost logo · headline "Stop clipping by hand." · subhead "One long video → 87+ ready-to-post clips. Runs on your machine. $49.99, once." · primary CTA **Get GhostClip →** (opens legal-gate modal) · glass metric "1 video → 87 clips · ~7 min".
 2. **The problem** — the volume you're sitting on / clipping by hand is dead time.
 3. **How it works** — editorial numbered list: 01 Drop a video → 02 AI transcribes, scores & ranks → 03 Export 87+ vertical 9:16 clips, post everywhere.
-4. **"Show the work" demo** ⭐ — the signature visual: a glass app window showing one source video exploding into a **grid of clip thumbnails** with AI score badges (e.g., "AI 91", "9:16", "FACE TRACK") + a count-up "87 clips from 1 video" and "~7 min". Honest (it's a product UI demo). Use real thumbnails from `~/ghostclip-render/public/thumbs` if available, else styled placeholders.
+4. **"Show the work" demo** ⭐ — the signature visual: a glass app window showing one source video exploding into a **grid of clip thumbnails** with AI score badges (e.g., "AI 91", "9:16", "FACE TRACK") + a count-up "87 clips from 1 video" and "~7 min". Honest (it's a product UI demo). Use real thumbnails from `~/jpf-render/public/thumbs` if available, else styled placeholders.
 5. **Who it's for / 3 income angles** — editorial: **WHOP** (faceless volume play), **Creator distribution** (podcasters/streamers/YouTubers repurposing long-form), **Affiliate** (promote it, earn $15/sale). Each = use case + *illustrative* math clearly labeled as example.
 6. **What's included** — the tool, local processing, vertical 9:16 export, captions, face-tracking, lifetime updates, bundled fonts.
 7. **Requirements** — Windows 10/11 or macOS 12+, Python 3.10+, Ollama, 8GB RAM. As pills/list.
@@ -72,7 +72,7 @@ Use the **GhostClips logo** (`~/Downloads/ghostclip-logo.svg` — purple ghost +
 
 ## 7. Tech & Deploy
 
-- Single-file `index.html` in `~/Desktop/Projects/clipping-system-site`.
+- Single-file `index.html` in `~/Desktop/Projects/flic-site`.
 - Deploy: the repo has a **pre-push git hook that auto-deploys via wrangler** on `git push`. Snapshot the current site as `index.legacy.html` before overwriting.
 - If the hook fails, fall back to wrangler direct-upload of a clean dist (index.html + logo.png + terms.html), like JPF.
 
@@ -90,5 +90,5 @@ Use the **GhostClips logo** (`~/Downloads/ghostclip-logo.svg` — purple ghost +
 
 ## 10. Open Questions (resolve in planning)
 
-- Exact clip-grid demo: real thumbnails vs CSS placeholders (decide at build based on `~/ghostclip-render/public/thumbs` contents).
+- Exact clip-grid demo: real thumbnails vs CSS placeholders (decide at build based on `~/jpf-render/public/thumbs` contents).
 - Whether to recolor/clean the logo SVG or render the existing one as-is to PNG.
